@@ -1,6 +1,4 @@
-BLE Robot Template with Advertisements
+Motor Control with PWM 
 ================
 
-Framework for using BLE advertisements + Kobuki
-When button pressed, robot turns, and sends gyro readings over BLE advertisements
-
+Example code for running the rear wheels of the SDAC using 2-channel PWM.
