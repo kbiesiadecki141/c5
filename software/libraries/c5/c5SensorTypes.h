@@ -17,10 +17,10 @@ typedef struct{
     float us_lb;
 
     // Raw value of bump sensors
-    float bump_r;
-    float bump_cr;
-    float bump_cl;
-    float bump_l;
+    bool bump_r;
+    bool bump_cr;
+    bool bump_cl;
+    bool bump_l;
 
 } C5Sensors_t;
 #endif
