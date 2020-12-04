@@ -9,9 +9,7 @@ typedef enum {
 } robot_state_t;
 
 // INPUTS
-static float read_us(bool front, bool right, bool back);
-
-static bool read_bump(bool right, bool front);
+static void read_sensors(C5Sensors_t * sensors);
 
 static bool in_tunnel(float side_close, float us_rf, float us_lf, float us_rb, float us_lb);
 
