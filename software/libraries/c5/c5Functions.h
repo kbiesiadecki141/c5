@@ -11,8 +11,16 @@ typedef enum {
 // INPUTS
 static void read_sensors(C5Sensors_t * sensors);
 
-static bool in_tunnel(float side_close, float us_rf, float us_lf, float us_rb, float us_lb);
+// FUNCTIONS
+static bool in_tunnel(C5Sensors_t * sensors, float side_close);
 
+static bool obstacle_detected(C5Sensors_t * sensors);
+
+static bool obstacle_avoided(C5Sensors_t * sensors, float front_close);
+
+static float us_diff(C5Sensors_t * sensors, bool front);
+
+// OUTPUTS
 static void set_wheel_speed(bool right, int wheel_num, int speed);
 
 static void set_speed(bool right, int speed);

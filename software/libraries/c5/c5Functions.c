@@ -1,15 +1,18 @@
-#include "c5Utilities.h"
+#include "c5Functions.h"
 
 // INPUTS
 static bool read_button(){
+	// TODO
 	return false;
 }
 
 static float read_us(bool front, bool right, bool back){
+	// TODO
 	return 0;
 }
 
 static bool read_bump(bool right, bool front){
+	// TODO
 	return false;
 }
 
@@ -29,18 +32,29 @@ static void read_sensors(C5Sensors_t * sensors){
 }
 
 // FUNCTIONS
+
 static bool in_tunnel(C5Sensors_t * sensors, float side_close){
 	return (sensors->us_rf < side_close) && (sensors->us_lf < side_close) && (sensors->us_rb < side_close) && (sensors->us_lb < side_close);
 }
 
-static bool obstacle_detected(C5Sensors_t * sensors){}
+static bool obstacle_detected(C5Sensors_t * sensors){
+	return sensors->bump_r || sensors->bump_cr || sensors->bump_cl || sensors->bump_l;
+}
 
-static bool obstacle_avoided(C5Sensors_t * sensors, float front_close){}
+static bool obstacle_avoided(C5Sensors_t * sensors, float front_close){
+	return sensors->us_f >= front_close;
+}
 
-static float us_diff(C5Sensors_t * sensors, bool front){}
+static float us_diff(C5Sensors_t * sensors, bool front){
+	if(front){
+		return sensors->us_lf - sensors->us_rf;
+	}
+	return sensors->us_lb - sensors->us_rb;
+}
 
 // OUTPUTS
 static void set_wheel_speed(bool right, int wheel_num, int speed){
+	// TODO
 	// 0: front
 	// 1: middle
 	// 2: back

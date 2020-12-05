@@ -18,11 +18,8 @@
 #include "nrf_pwr_mgmt.h"
 #include "nrf_drv_spi.h"
 
-#include "romiActuator.h"
 #include "romiUtilities.h"
-#include "romiSensorPoll.h"
-
-#include "c5Utilities.h"
+#include "romiFunctions.h"
 
 // I2C manager
 // NRF_TWI_MNGR_DEF(twi_mngr_instance, 5, 0);
@@ -43,9 +40,6 @@ int main(void) {
   // configure initial state
   robot_state_t state = OFF;
   bool button_pressed;
-  bool bumpLeft;
-  bool bumpCenter;
-  bool bumpRight;
   bool anyBump;
 
   bool turn_right;
@@ -54,12 +48,9 @@ int main(void) {
   // loop forever, running state machine
   while (1) {
     // read sensors from robot
-    romiSensorPoll(&sensors);
+    read_sensors(&sensors);
     button_pressed = is_button_pressed(&sensors);
-    bumpLeft = sensors.bumps_wheelDrops.bumpLeft;
-    bumpCenter = sensors.bumps_wheelDrops.bumpCenter;
-    bumpRight = sensors.bumps_wheelDrops.bumpRight;
-    anyBump = bumpLeft || bumpCenter || bumpRight;
+    anyBump = obstacle_detected(&sensors, &turn_right);
 
     // delay before continuing
     // Note: removing this delay will make responses quicker, but will result
@@ -74,7 +65,7 @@ int main(void) {
           state = TELEOP;
         } else {
           // perform state-specific actions here
-          romiDriveDirect(0, 0);
+          stop();
           state = OFF;
         }
         break; // each case needs to end with break!
@@ -85,16 +76,11 @@ int main(void) {
         if (button_pressed){
           state = OFF;
         } else if (anyBump){
-          if(bumpLeft){
-            turn_right = true;
-          } else{
-            turn_right = false;
-          }
-          romiDriveDirect(-100, -100);
+          set_speeds(-100, -100);
           state = AVOID;
         } else {
           // perform state-specific actions here
-          romiDriveDirect(100, 100);
+          set_speeds(100, 100);
           state = TELEOP;
         }
         break; // each case needs to end with break!
@@ -104,18 +90,22 @@ int main(void) {
         // transition logic
         if (button_pressed){
           state = OFF;
-        } else if (bumpCenter){
+        } else if (sensors.bumps_wheelDrops.bumpCenter){
           state = TELEOP;
         } else {
           // perform state-specific actions here
           if(turn_right){
-            romiDriveDirect(100, -100);
+            set_speeds(100, -100);
           }else{
-            romiDriveDirect(-100, 100);
+            set_speeds(-100, 100);
           }
           state = AVOID;
         }
         break; // each case needs to end with break!
+      }
+
+      case TUNNEL:{
+        break;
       }
     }
   }
