@@ -12,7 +12,7 @@ typedef enum {
 void read_sensors(RomiSensors_t * sensors);
 
 // FUNCTIONS
-bool in_tunnel(RomiSensors_t * sensors, float side_close);
+bool inside_tunnel(RomiSensors_t * sensors, float side_close);
 
 bool obstacle_detected(RomiSensors_t * sensors, bool * turn_right);
 
