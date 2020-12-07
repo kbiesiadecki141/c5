@@ -51,6 +51,10 @@ int main(void) {
   bool turn_right;
   float front_diff;
   float back_diff;
+  int back_up_time = 20;
+  int turning_time = 10;
+  int back_up_counter;
+  int turning_counter;
   RomiSensors_t sensors = {0};
 
   // loop forever, running state machine
@@ -83,11 +87,12 @@ int main(void) {
 
       case TELEOP: {
         // transition logic
-        if (button_pressed){
+        if (button_pressed) {
           state = OFF;
-        } else if (obs_detected){
+        } else if (obs_detected) {
           state = AVOID;
-        } else if (in_tunnel){
+          back_up_counter = 0;
+        } else if (in_tunnel) {
           state = TUNNEL;
         } else {
           // perform state-specific actions here
@@ -99,20 +104,30 @@ int main(void) {
 
       case AVOID: {
         // transition logic
-        if (button_pressed){
+        if (button_pressed) {
           state = OFF;
-        } else if (!(obs_detected) && obs_avoided){
-          if(in_tunnel){
+        } else if (!(obs_detected) && obs_avoided && turning_counter >= turning_time) {
+          if (in_tunnel) {
             state = TUNNEL;
-          } else{
+          } else {
             state = TELEOP;
           }
         } else {
           // perform state-specific actions here
-          if(turn_right){
-            set_speeds(max_speed, -max_speed);
-          }else{
-            set_speeds(-max_speed, max_speed);
+          if (back_up_counter < back_up_time) {
+            back_up_counter = back_up_counter + 1;
+            set_speeds(-max_speed, -max_speed);
+          } else {
+            if (!(obs_detected) && obs_avoided) {
+              turning_counter = 0;
+            } else {
+              turning_counter = turning_counter + 1;
+            }
+            if (turn_right) {
+              set_speeds(max_speed/2, -max_speed/2);
+            } else {
+              set_speeds(-max_speed/2, max_speed/2);
+            }
           }
           state = AVOID;
         }
@@ -121,11 +136,12 @@ int main(void) {
 
       case TUNNEL:{
         // transition logic
-        if (button_pressed){
+        if (button_pressed) {
           state = OFF;
-        } else if (obs_detected){
+        } else if (obs_detected) {
           state = AVOID;
-        } else if (! in_tunnel){
+          back_up_counter = 0;
+        } else if (! in_tunnel) {
           state = TELEOP;
         } else {
           // perform state-specific actions here
