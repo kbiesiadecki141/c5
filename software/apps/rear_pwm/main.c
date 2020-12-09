@@ -25,12 +25,10 @@
 #include "nrf_drv_spi.h"
 
 #include "buckler.h"
-#include "display.h"
-#include "kobukiActuator.h"
-#include "kobukiSensorPoll.h"
-#include "kobukiSensorTypes.h"
-#include "kobukiUtilities.h"
-#include "lsm9ds1.h"
+#include "romiActuator.h"
+#include "romiSensorPoll.h"
+#include "romiSensorTypes.h"
+#include "romiUtilities.h"
 #include "simple_ble.h"
 
 #include "app_pwm.h"
@@ -40,7 +38,7 @@
 // Create a handle which will point to the PWM and also pass the hardware timer instance.
 // Here, 1 indicates that we are using the hardware timer
 APP_PWM_INSTANCE(m_pwm, 1);
-// nrf_drv_pwm_t m_pwm = NRF_DRV_PWM_INSTANCE(1);
+// static nrf_drv_pwm_t m_pwm = NRF_DRV_PWM_INSTANCE(1);
 
 // define the pwm time period for pwm wave 
 // 20000 is another nice-sounding frequency

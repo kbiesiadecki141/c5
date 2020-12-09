@@ -24,15 +24,14 @@
 #include "nrf_pwr_mgmt.h"
 #include "nrf_drv_spi.h"
 #include "nrf_drv_pwm.h"
+#include "nrf_drv_clock.h"
+#include "app_util_platform.h"
 
 #include "buckler.h"
-#include "display.h"
-#include "kobukiActuator.h"
-#include "kobukiSensorPoll.h"
-#include "kobukiSensorTypes.h"
-#include "kobukiUtilities.h"
-#include "lsm9ds1.h"
-#include "simple_ble.h"
+#include "romiActuator.h"
+#include "romiSensorPoll.h"
+#include "romiSensorTypes.h"
+#include "romiUtilities.h"
 
 #include "app_pwm.h"
 
@@ -45,7 +44,7 @@
 
 
 // We want to use the PWM drivers, not the PWM library.
-nrf_drv_pwm_t m_pwm = NRF_DRV_PWM_INSTANCE(1);
+static nrf_drv_pwm_t m_pwm1 = NRF_DRV_PWM_INSTANCE(1);
 // nrf_drv_pwm_t m_pwm_2 = NRF_DRV_PWM_INSTANCE(2);
 
 // now timers 2, 3 are enabled
@@ -93,48 +92,116 @@ void pwm_ready_handler_2(uint32_t pwm_id)
 //     APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, false);
 // }
 
+// Declare variables holding PWM sequence values. In this example only one channel is used 
+nrf_pwm_values_individual_t seq_values[] = {0, 50, 1, 80};
+nrf_pwm_sequence_t const seq =
+{
+    .values.p_individual = seq_values,
+    .length          = NRF_PWM_VALUES_LENGTH(seq_values),
+    .repeats         = 0,
+    .end_delay       = 0
+};
+
+// Set duty cycle between 0 and 100%
+void pwm_update_duty_cycle(uint8_t duty_cycle)
+{
+    
+    // Check if value is outside of range. If so, set to 80%
+    if(duty_cycle >= 80)
+    {
+        seq_values->channel_0 = 80;
+    }
+    else
+    {
+        seq_values->channel_0 = duty_cycle;
+    }
+    
+    nrf_drv_pwm_simple_playback(&m_pwm1, &seq, 1, NRF_DRV_PWM_FLAG_LOOP);
+}
+
+static void pwm_init(void)
+{
+    nrf_drv_pwm_config_t const config1 =
+    {
+        .output_pins =
+        {
+            INPUT_1,             // channel 0
+            INPUT_2,             // channel 1
+            INPUT_3,             // channel 2
+            INPUT_4,             // channel 3
+        },
+        .irq_priority = APP_IRQ_PRIORITY_LOWEST,
+        .base_clock   = NRF_PWM_CLK_1MHz,
+        .count_mode   = NRF_PWM_MODE_UP,
+        .top_value    = 80,
+        .load_mode    = NRF_PWM_LOAD_INDIVIDUAL,
+        .step_mode    = NRF_PWM_STEP_AUTO
+    };
+    // Init PWM without error handler
+    APP_ERROR_CHECK(nrf_drv_pwm_init(&m_pwm1, &config1, NULL));
+    
+}
+
 
 int main(void)
 {
+    // APP_PWM_INSTANCE stuff
     // configure the pins as outputs 
-    nrf_gpio_cfg_output(INPUT_1); 
-    nrf_gpio_cfg_output(INPUT_2); 
-    nrf_gpio_cfg_output(INPUT_3); 
-    nrf_gpio_cfg_output(INPUT_4);
+    // nrf_gpio_cfg_output(INPUT_1); 
+    // nrf_gpio_cfg_output(INPUT_2); 
+    // nrf_gpio_cfg_output(INPUT_3); 
+    // nrf_gpio_cfg_output(INPUT_4);
 
     // set direction to clockwise
-    nrf_gpio_pin_set(INPUT_1);  
-    nrf_gpio_pin_clear(INPUT_2); 
-    nrf_gpio_pin_set(INPUT_4);  
-    nrf_gpio_pin_clear(INPUT_3);
+    // nrf_gpio_pin_set(INPUT_1);  
+    // nrf_gpio_pin_clear(INPUT_2); 
+    // nrf_gpio_pin_set(INPUT_4);  
+    // nrf_gpio_pin_clear(INPUT_3);
 
-    ret_code_t err_code; // a variable to hold error value
+    // ret_code_t err_code; // a variable to hold error value
 
     // create a struct to hold the configuration values and pass it the default configurations
     // along with the time period of the pwm wave and the pin on which we want to generate pwm signals
 
-    app_pwm_config_t pwm_config = APP_PWM_DEFAULT_CONFIG_2CH(FREQ_IN_US, ENABLE_PIN_A, ENABLE_PIN_B);
+    // app_pwm_config_t pwm_config = APP_PWM_DEFAULT_CONFIG_2CH(FREQ_IN_US, ENABLE_PIN_A, ENABLE_PIN_B);
 
     // set the polarity as active high which means the duty will be reflected according to logic high state for e.g 
     // if we set the duty to 80 percent then during the 80 percent time period the pin will remain in high state. 
-    pwm_config.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
-    pwm_config.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
+    // pwm_config.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
+    // pwm_config.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
 
     // initialize the pwm more details in pwm library with hardware timers tutorial be sure to check it out first then 
     // come to this tutorial
-    err_code = app_pwm_init(&m_pwm, &pwm_config, pwm_ready_handler_1);
-    APP_ERROR_CHECK(err_code);
-    app_pwm_enable(&m_pwm); // enable the pwm so that it can start working
+    // err_code = app_pwm_init(&m_pwm, &pwm_config, pwm_ready_handler_1);
+    // APP_ERROR_CHECK(err_code);
+    // app_pwm_enable(&m_pwm); // enable the pwm so that it can start working
 
-    while (true) {
+    // while (true) {
 
-      // update the duty values and turn on the led to show a state
-      while(app_pwm_channel_duty_set(&m_pwm, 0, 50) == NRF_ERROR_BUSY);
-      app_sched_execute();
-      while(app_pwm_channel_duty_set(&m_pwm, 1, 50) == NRF_ERROR_BUSY);
-      nrf_delay_ms(5000);
+    //   // update the duty values and turn on the led to show a state
+    //   while(app_pwm_channel_duty_set(&m_pwm, 0, 50) == NRF_ERROR_BUSY);
+    //   // app_sched_execute();
+    //   while(app_pwm_channel_duty_set(&m_pwm, 1, 50) == NRF_ERROR_BUSY);
+    //   nrf_delay_ms(5000);
 
+    // }
+
+
+
+    // Start clock for accurate frequencies
+    NRF_CLOCK->TASKS_HFCLKSTART = 1; 
+    // Wait for clock to start
+    while(NRF_CLOCK->EVENTS_HFCLKSTARTED == 0);
+    
+    pwm_init();
+
+    pwm_update_duty_cycle(0);
+
+    for (;;)
+    {
+     __WFE;
     }
+
   }
 // int main(void)
 // {
