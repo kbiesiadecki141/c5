@@ -1,5 +1,3 @@
 _build
 *.swo
 
-boards
-nrf52x-base
