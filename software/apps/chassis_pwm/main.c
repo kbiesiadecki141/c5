@@ -98,8 +98,8 @@ nrf_pwm_sequence_t const seq =
 {
     .values.p_individual = seq_values,
     .length          = NRF_PWM_VALUES_LENGTH(seq_values),
-    .repeats         = 0,
-    .end_delay       = 0
+    .repeats         = 2,
+    .end_delay       = 1
 };
 
 // Set duty cycle between 0 and 100%
