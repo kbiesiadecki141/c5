@@ -61,11 +61,18 @@ static uint8_t m_used = 0;
 #define INPUT_4   20  // this pin is connected with IN4
 
 #define FRONT_LEFT_A    12  // this pin is connected with enable 1 pin of L298N module
-#define FRONT_RIGHT_B   17  // this pin is connected with enable 2 pin of L298N module
+#define FRONT_LEFT_B   17  // this pin is connected with enable 2 pin of L298N module
 #define INPUT_5  13
 #define INPUT_6  14
 #define INPUT_7  15
 #define INPUT_8  16
+
+#define FRONT_RIGHT_A    5  // this pin is connected with enable 1 pin of L298N module
+#define FRONT_RIGHT_B   10  // this pin is connected with enable 2 pin of L298N module
+#define INPUT_9  6
+#define INPUT_10  7
+#define INPUT_11  8
+#define INPUT_12  9
 
 // On-board LED test example
 #define OUTPUT_PIN 17
@@ -90,13 +97,15 @@ void pwm_update_duty_cycle(uint8_t duty_cycle, bool direction)
 {
     if (duty_cycle >= 100) {
             seq_values->channel_0 = 100;
-            seq_values->channel_2 = 100;
+            // seq_values->channel_2 = 100;
         } else {
             seq_values->channel_0 = duty_cycle | (1 << 15);
-            seq_values->channel_2 = duty_cycle | (1 << 15);
+            // seq_values->channel_2 = duty_cycle | (1 << 15);
         }
     
     nrf_drv_pwm_simple_playback(&m_pwm0, &seq, 3, NRF_DRV_PWM_FLAG_LOOP);
+    nrf_drv_pwm_simple_playback(&m_pwm1, &seq, 3, NRF_DRV_PWM_FLAG_LOOP);
+    nrf_drv_pwm_simple_playback(&m_pwm2, &seq, 3, NRF_DRV_PWM_FLAG_LOOP);
 }
 
 // will have to make separate pwm_init functions if using this format for directions
@@ -106,10 +115,13 @@ static void pwm_init(void)
     {
         .output_pins =
         {
-            ENABLE_PIN_A | NRF_DRV_PWM_PIN_INVERTED, // channel 0 // move forward by default
-            INPUT_1 | NRF_DRV_PWM_PIN_INVERTED,             // channel 1
-            ENABLE_PIN_B | NRF_DRV_PWM_PIN_INVERTED,             // channel 2
-            INPUT_4 | NRF_DRV_PWM_PIN_INVERTED,             // channel 3
+            OUTPUT_PIN, // channel 0 // move forward by default
+            NRF_DRV_PWM_PIN_NOT_USED,
+            NRF_DRV_PWM_PIN_NOT_USED,
+            NRF_DRV_PWM_PIN_NOT_USED
+            // INPUT_1 | NRF_DRV_PWM_PIN_INVERTED,             // channel 1
+            // ENABLE_PIN_B | NRF_DRV_PWM_PIN_INVERTED,             // channel 2
+            // INPUT_4 | NRF_DRV_PWM_PIN_INVERTED,             // channel 3
         },
         .irq_priority = APP_IRQ_PRIORITY_LOWEST,
         .base_clock   = NRF_PWM_CLK_1MHz,
@@ -120,7 +132,56 @@ static void pwm_init(void)
     };
     // Init PWM without error handler
     APP_ERROR_CHECK(nrf_drv_pwm_init(&m_pwm0, &config0, NULL));
-    
+}
+
+static void pwm_init3(void)
+{
+    nrf_drv_pwm_config_t const config0 =
+    {
+        .output_pins =
+        {
+            OUTPUT_PIN_2, // channel 0 // move forward by default
+            NRF_DRV_PWM_PIN_NOT_USED,
+            NRF_DRV_PWM_PIN_NOT_USED,
+            NRF_DRV_PWM_PIN_NOT_USED
+            // INPUT_1 | NRF_DRV_PWM_PIN_INVERTED,             // channel 1
+            // ENABLE_PIN_B | NRF_DRV_PWM_PIN_INVERTED,             // channel 2
+            // INPUT_4 | NRF_DRV_PWM_PIN_INVERTED,             // channel 3
+        },
+        .irq_priority = APP_IRQ_PRIORITY_LOWEST,
+        .base_clock   = NRF_PWM_CLK_1MHz,
+        .count_mode   = NRF_PWM_MODE_UP,
+        .top_value    = 100,
+        .load_mode    = NRF_PWM_LOAD_INDIVIDUAL,
+        .step_mode    = NRF_PWM_STEP_AUTO
+    };
+    // Init PWM without error handler
+    APP_ERROR_CHECK(nrf_drv_pwm_init(&m_pwm2, &config0, NULL));
+}
+
+static void pwm_init2(void)
+{
+    nrf_drv_pwm_config_t const config0 =
+    {
+        .output_pins =
+        {
+            OUTPUT_PIN_3, // channel 0 // move forward by default
+            NRF_DRV_PWM_PIN_NOT_USED,
+            NRF_DRV_PWM_PIN_NOT_USED,
+            NRF_DRV_PWM_PIN_NOT_USED
+            // INPUT_1 | NRF_DRV_PWM_PIN_INVERTED,             // channel 1
+            // ENABLE_PIN_B | NRF_DRV_PWM_PIN_INVERTED,             // channel 2
+            // INPUT_4 | NRF_DRV_PWM_PIN_INVERTED,             // channel 3
+        },
+        .irq_priority = APP_IRQ_PRIORITY_LOWEST,
+        .base_clock   = NRF_PWM_CLK_1MHz,
+        .count_mode   = NRF_PWM_MODE_UP,
+        .top_value    = 100,
+        .load_mode    = NRF_PWM_LOAD_INDIVIDUAL,
+        .step_mode    = NRF_PWM_STEP_AUTO
+    };
+    // Init PWM without error handler
+    APP_ERROR_CHECK(nrf_drv_pwm_init(&m_pwm1, &config0, NULL));
 }
 
 int main(void)
@@ -133,6 +194,8 @@ int main(void)
         ;
     
     pwm_init();
+    pwm_init2();
+    pwm_init3();
 
     bool dir = true; // goes backwards, clockwise when false
 
