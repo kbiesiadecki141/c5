@@ -116,13 +116,13 @@ static void pwm_init(void)
             INPUT_4,             // channel 3
         },
         .irq_priority = APP_IRQ_PRIORITY_LOWEST,
-        .base_clock   = NRF_PWM_CLK_1MHz,
+        .base_clock   = NRF_PWM_CLK_125KHz,
         .count_mode   = NRF_PWM_MODE_UP,
         .top_value    = 80,
         .load_mode    = NRF_PWM_LOAD_INDIVIDUAL,
         .step_mode    = NRF_PWM_STEP_AUTO
     };
-    // Init PWM without error handler
+    // Init PWM without error handler - remember to add back in
     APP_ERROR_CHECK(nrf_drv_pwm_init(&m_pwm1, &config1, NULL));
 
 }
