@@ -1,0 +1,152 @@
+// BLE advertisement template
+//
+// Advertises device name: EE149
+
+#include <stdbool.h>
+#include <stdint.h>
+#include "nrf.h"
+#include "app_util.h"
+#include "nrf_twi_mngr.h"
+#include "nrf_log.h"
+#include "nrf_log_ctrl.h"
+#include "nrf_log_default_backends.h"
+
+#include "buckler.h"
+#include "simple_ble.h"
+
+#include "max44009.h"
+
+// Create a timer
+APP_TIMER_DEF(adv_timer);
+
+// I2C manager
+NRF_TWI_MNGR_DEF(twi_mngr_instance, 5, 0);
+
+// Intervals for advertising and connections
+static simple_ble_config_t ble_config = {
+        // c0:98:e5:49:xx:xx
+        .platform_id       = 0x49,    // used as 4th octect in device BLE address
+        .device_id         = 0x0000,  // TODO: replace with your lab bench number
+        .adv_name          = "EE149", // Note that this name is not displayed to save room in the advertisement for data.
+        .adv_interval      = MSEC_TO_UNITS(1000, UNIT_0_625_MS),
+        .min_conn_interval = MSEC_TO_UNITS(500, UNIT_1_25_MS),
+        .max_conn_interval = MSEC_TO_UNITS(1000, UNIT_1_25_MS),
+};
+
+void light_timer_callback() {
+    printf("Light timer fired!\n");
+    // TODO: implement this function!
+    // Use Simple BLE function to read light sensor and put data in
+    // advertisement, but be careful about doing it in the callback itself!
+}
+
+/*******************************************************************************
+ *   State for this application
+ ******************************************************************************/
+// Main application state
+simple_ble_app_t* simple_ble_app;
+
+// Callback for connected event
+extern void ble_evt_connected(ble_evt_t const* p_ble_evt);
+// Callback for disconnected event
+extern void ble_evt_disconnected(ble_evt_t const* p_ble_evt);
+// Callback for when perhiperal is written to
+extern void ble_evt_write(ble_evt_t const* p_ble_evt);
+
+extern void ble_evt_adv_report(ble_evt_t const* p_ble_evt);
+
+
+
+// UUID 5265cd84-54b6-4c77-88fa-6add1e6b86e3
+static simple_ble_service_t led_service = {{
+  .uuid128 = {0xe3,0x86,0x6b,0x1e,0xdd,0x6a,0xfa,0x88,
+        0x77,0x4c,0xb6,0x54,0x84,0xcd,0x65,0x52}
+}};
+
+static simple_ble_char_t led_state_char = {.uuid16 = 0xcd85};
+
+// UUID 5265cd84-54b6-4c77-88fa-6add1e6b86e4
+static simple_ble_char_t row1_state_char = {.uuid16 = 0xcd86};
+
+static char buf0[16];
+static char buf1[16];
+
+void ble_evt_write(ble_evt_t const* p_ble_evt) {
+  if (simple_ble_is_char_event(p_ble_evt, &led_state_char)) {
+      printf("Got write to LED characteristic!\n");
+      if (led_state) {
+        printf("Turning on LED!\n");
+        nrf_gpio_pin_clear(LED);
+      } else {
+        printf("Turning off LED!\n");
+        nrf_gpio_pin_set(LED);
+      }
+    }
+
+  // Parse advertisements after scanning with BLE.
+  ble_gap_evt_adv_report_t const* adv_report = &(p_ble_evt->evt.gap_evt.params.adv_report);
+
+ // if (simple_ble_is_char_event(p_ble_evt, &led_state_char)) {
+ //   display_write(buf0, DISPLAY_LINE_0);
+ // } else if (simple_ble_is_char_event(p_ble_evt )) {
+ //   display_write(buf1, DISPLAY_LINE_1);
+ // }
+}
+
+int main(void) {
+  ret_code_t error_code = NRF_SUCCESS;
+
+  // Initialize
+
+  // initialize RTT library
+  error_code = NRF_LOG_INIT(NULL);
+  APP_ERROR_CHECK(error_code);
+  NRF_LOG_DEFAULT_BACKENDS_INIT();
+  printf("Log initialized\n");
+
+  // initialize i2c master (two wire interface)
+  nrf_drv_twi_config_t i2c_config = NRF_DRV_TWI_DEFAULT_CONFIG;
+  i2c_config.scl = BUCKLER_SENSORS_SCL;
+  i2c_config.sda = BUCKLER_SENSORS_SDA;
+  i2c_config.frequency = NRF_TWIM_FREQ_100K;
+  error_code = nrf_twi_mngr_init(&twi_mngr_instance, &i2c_config);
+  APP_ERROR_CHECK(error_code);
+
+  // initialize MAX44009 driver
+  const max44009_config_t config = {
+    .continuous = 0,
+    .manual = 0,
+    .cdr = 0,
+    .int_time = 3,
+  };
+  max44009_init(&twi_mngr_instance, BUCKLER_LIGHT_INTERRUPT);
+  max44009_config(config);
+  printf("MAX44009 initialized\n");
+
+  // Setup BLE
+  simple_ble_app = simple_ble_init(&ble_config);
+
+  simple_ble_add_service(&led_service);
+
+  simple_ble_add_characteristic(1, 1, 0, 0,
+      sizeof(led_state), (uint8_t*)&led_state,
+      &led_service, &led_state_char);
+
+  // TODO replace this with advertisement sending light data
+  // simple_ble_adv_only_name();
+  simple_ble_add_characteristic(1, 1, 0, 0, sizeof(buf0), (uint8_t*)&buf0,
+    &led_service, &row1_state_char);
+
+  simple_ble_add_characteristic(1, 1, 0, 0, sizeof(buf1), (uint8_t*)&buf1,
+    &led_service, &row1_state_char);
+
+  // Set a timer to read the light sensor and update advertisement data every second.
+  app_timer_init();
+  app_timer_create(&adv_timer, APP_TIMER_MODE_REPEATED, (app_timer_timeout_handler_t) light_timer_callback);
+  app_timer_start(adv_timer, APP_TIMER_TICKS(1000), NULL); // 1000 milliseconds
+
+  while(1) {
+    // Sleep while SoftDevice handles BLE
+    power_manage();
+  }
+}
