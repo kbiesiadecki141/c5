@@ -9,18 +9,18 @@ BOARD = Buckler_revB
 USE_BLE = 1
 
 # Get directory of this makefile
-#BOARD_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+BOARD_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 # Include any files in this directory in the build process
-#BOARD_SOURCE_PATHS = $(BOARD_DIR)/.
-#BOARD_SOURCE_PATHS += $(wildcard $(BOARD_DIR)/../../libraries/*/)
-#BOARD_HEADER_PATHS = $(BOARD_DIR)/.
-#BOARD_HEADER_PATHS += $(BOARD_DIR)/../.
-#BOARD_HEADER_PATHS += $(wildcard $(BOARD_DIR)/../../libraries/*/)
-#BOARD_LINKER_PATHS = $(BOARD_DIR)/.
-#BOARD_SOURCES = $(notdir $(wildcard $(BOARD_DIR)/./*.c))
-#BOARD_SOURCES += $(notdir $(wildcard $(BOARD_DIR)/../../libraries/*/*.c))
-#BOARD_AS = $(notdir $(wildcard $(BOARD_DIR)/./*.s))
+BOARD_SOURCE_PATHS = $(BOARD_DIR)/.
+BOARD_SOURCE_PATHS += $(wildcard $(BOARD_DIR)/../../libraries/*/)
+BOARD_HEADER_PATHS = $(BOARD_DIR)/.
+BOARD_HEADER_PATHS += $(BOARD_DIR)/../.
+BOARD_HEADER_PATHS += $(wildcard $(BOARD_DIR)/../../libraries/*/)
+BOARD_LINKER_PATHS = $(BOARD_DIR)/.
+BOARD_SOURCES = $(notdir $(wildcard $(BOARD_DIR)/./*.c))
+BOARD_SOURCES += $(notdir $(wildcard $(BOARD_DIR)/../../libraries/*/*.c))
+BOARD_AS = $(notdir $(wildcard $(BOARD_DIR)/./*.s))
 
 # Convert board to upper case
 BOARD_UPPER = $(shell echo $(BOARD) | tr a-z A-Z)
