@@ -35,9 +35,6 @@ BOARD_VARS = \
 
 # Default SDK source files to be included
 BOARD_SOURCES += \
-	SEGGER_RTT.c\
-	SEGGER_RTT_Syscalls_GCC.c\
-	SEGGER_RTT_printf.c\
 	app_error.c\
 	app_error_handler_gcc.c\
 	app_pwm.c\
@@ -76,7 +73,6 @@ BOARD_SOURCES += \
 	nrf_strerror.c\
 	nrf_twi_mngr.c\
 	nrfx_clock.c\
-	nrfx_gpiote.c\
 	nrfx_ppi.c\
 	nrfx_prs.c\
 	nrfx_saadc.c\
@@ -87,6 +83,9 @@ BOARD_SOURCES += \
 	nrfx_twim.c\
 	nrfx_uart.c\
 	nrfx_uarte.c\
+	SEGGER_RTT.c\
+	SEGGER_RTT_Syscalls_GCC.c\
+	SEGGER_RTT_printf.c\
 	simple_logger.c\
 
 ifneq ($(SOFTDEVICE_MODEL),blank)

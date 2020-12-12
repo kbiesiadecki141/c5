@@ -17,6 +17,7 @@
 #include "nrf_gpio.h"
 #include "nrf_delay.h"
 #include "hcsr04_ultrasonic.h"
+#include "virtual_timer.h"
 
 #define timeout 30000	// ultrasonic sensor timeout
 
@@ -39,6 +40,8 @@ ret_code_t hcsr04_init(const int trig_pin, const int echo_pin) {
   // Enable interrupt for Event[0] and Event[1] = 0b011.
   NRF_GPIOTE->INTENSET |= 3;
 
+  virtual_timer_init();
+
   // Enable interrupt in the NVIC.
   NVIC_EnableIRQ(GPIOTE_IRQn);
 
@@ -47,47 +50,57 @@ ret_code_t hcsr04_init(const int trig_pin, const int echo_pin) {
    return error_code;
 }
 
+uint32_t start_time;
+uint32_t end_time;
+uint32_t diff_time;
+float us_dist;
+
 // GPIO Interrupt Handler. 
 void GPIOTE_IRQHandler(void) {
     NVIC_DisableIRQ(GPIOTE_IRQn);
-    printf("Ultrasonic interrupt \n");
+    // printf("Ultrasonic interrupt \n");
 
     // Lo To Hi Event: Ranging Starts.
     // - When the Echo pin starts to read HI, our distance measurement begins.
     if (NRF_GPIOTE->EVENTS_IN[0]) {
       NRF_GPIOTE->EVENTS_IN[0] = 0; // Clear interrupt.
-      printf("Echo reads low to high \n"); 
+      // printf("Echo reads low to high \n"); 
+      start_time = read_timer();
+      //printf("start %ld\n", start_time);
     } 
 
     // Hi To Lo Event: Ranging Ends.
     // - When the Echo pin starts to read LO, our distance measurement is complete.
     if (NRF_GPIOTE->EVENTS_IN[1]) {
       NRF_GPIOTE->EVENTS_IN[1] = 0; // Clear interrupt.
-      printf("Echo reads high to low \n"); 
+      // printf("Echo reads high to low \n"); 
+      end_time = read_timer();
+      //printf("end %ld\n", end_time);
+      //printf("diff %ld\n", diff_time);
     } 
     
-    nrf_delay_ms(500);
+    nrf_delay_us(10);
 
+    // printf("Finished interrupt \n");
     NVIC_EnableIRQ(GPIOTE_IRQn);
 }
 
 
 float hcsr04_read_distance() {
-    printf("Reading distance.... \n");
+    // printf("Reading distance.... \n");
     // printf("trig %i", TRIG_PIN);
     gpio_clear(TRIG_PIN); // Clear trigger pin.
-    printf("cleared 1 \n");
     nrf_delay_us(10);
-    printf("setting 1 \n");
     gpio_set(TRIG_PIN);   // Set trigger pin to start measurement.
     nrf_delay_us(10);
-    printf("set 1 \n");
     gpio_clear(TRIG_PIN);
-    printf("cleared 1 \n");
     nrf_delay_us(10);
+    diff_time = end_time - start_time;
+    us_dist = diff_time * 340 / 2000000.;
+    // printf("dist %f\n", us_dist);
 
     __WFI();
-    return -1;
+    return us_dist;
 }
 
 
