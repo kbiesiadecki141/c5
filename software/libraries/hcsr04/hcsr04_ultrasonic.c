@@ -87,7 +87,7 @@ void GPIOTE_IRQHandler(void) {
 
 
 float hcsr04_read_distance() {
-    printf("Reading distance.... \n");
+    // printf("Reading distance.... \n");
     // printf("trig %i", TRIG_PIN);
     gpio_clear(TRIG_PIN); // Clear trigger pin.
     nrf_delay_us(10);

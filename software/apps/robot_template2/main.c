@@ -25,6 +25,7 @@
 // NRF_TWI_MNGR_DEF(twi_mngr_instance, 5, 0);
 
 int main(void) {
+  printf("Initializing\n");
   ret_code_t error_code = NRF_SUCCESS;
 
   // initialize RTT library
@@ -67,7 +68,6 @@ int main(void) {
     obs_detected = obstacle_detected(&sensors, &turn_right);
     obs_avoided = obstacle_avoided(&sensors, front_close);
     // nrf_delay_ms(1000);
-    // printf("obstacle_avoided %d\n", obs_avoided);
     in_tunnel = inside_tunnel(&sensors, side_close);
 
     // delay before continuing
@@ -80,7 +80,8 @@ int main(void) {
       case OFF: {
         // transition logic
         if (button_pressed) {
-          state = TUNNEL;
+          state = TELEOP;
+          printf("TELEOP\n");
         } else {
           // perform state-specific actions here
           stop();
@@ -94,10 +95,13 @@ int main(void) {
         if (button_pressed) {
           state = OFF;
         } else if (obs_detected) {
+          set_speeds(-max_speed, -max_speed);
           state = AVOID;
+          printf("AVOID\n");
           back_up_counter = 0;
         } else if (in_tunnel) {
           state = TUNNEL;
+          printf("TUNNEL\n");
         } else {
           // perform state-specific actions here
           set_speeds(max_speed, max_speed);
@@ -108,13 +112,19 @@ int main(void) {
 
       case AVOID: {
         // transition logic
+
+        printf("obstacle_avoided %d\n", obs_avoided);
+        printf("back_up_counter %d\n", back_up_counter);
+        printf("turning_counter %d\n", turning_counter);
         if (button_pressed) {
           state = OFF;
-        } else if (obs_avoided) {
+        } else if (!(obs_detected) && obs_avoided && back_up_counter >= back_up_time && turning_counter >= turning_time) {
           if (in_tunnel) {
             state = TUNNEL;
+            printf("TUNNEL\n");
           } else {
             state = TELEOP;
+            printf("TELEOP\n");
           }
         } else {
           // perform state-specific actions here
@@ -143,10 +153,13 @@ int main(void) {
         if (button_pressed) {
           state = OFF;
         } else if (obs_detected) {
+          set_speeds(-max_speed, -max_speed);
           state = AVOID;
+          printf("AVOID\n");
           back_up_counter = 0;
         } else if (! in_tunnel) {
           state = TELEOP;
+          printf("TELEOP\n");
         } else {
           // perform state-specific actions here
 

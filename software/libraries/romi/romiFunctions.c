@@ -20,7 +20,7 @@ bool inside_tunnel(RomiSensors_t * sensors, float side_close){
 }
 
 bool obstacle_detected(RomiSensors_t * sensors, bool * turn_right){\
-	if (sensors->bumps_wheelDrops.bumpLeft || sensors->bumps_wheelDrops.bumpLeft || sensors->bumps_wheelDrops.bumpRight){
+	if (sensors->bumps_wheelDrops.bumpLeft || sensors->bumps_wheelDrops.bumpCenter || sensors->bumps_wheelDrops.bumpRight){
 		*turn_right = sensors->bumps_wheelDrops.bumpLeft;
 		return true;
 	}
@@ -29,7 +29,7 @@ bool obstacle_detected(RomiSensors_t * sensors, bool * turn_right){\
 
 bool obstacle_avoided(RomiSensors_t * sensors, float front_close){
   	float this_dist = hcsr04_read_distance();
-    printf("this_dist %f\n", this_dist);
+    // printf("avoided %d\n", this_dist > front_close);
 	return this_dist > front_close;
 	// return sensors->bumps_wheelDrops.bumpCenter;
 }
