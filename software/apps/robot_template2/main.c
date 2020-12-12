@@ -18,41 +18,11 @@
 #include "nrf_pwr_mgmt.h"
 #include "nrf_drv_spi.h"
 
-#include "romiActuator.h"
-#include "romiSensorPoll.h"
-#include "romiSensorTypes.h"
+#include "romiFunctions.h"
 #include "romiUtilities.h"
 
 // I2C manager
 // NRF_TWI_MNGR_DEF(twi_mngr_instance, 5, 0);
-
-typedef enum {
-  OFF,
-  DRIVING,
-  TURNING_CLOCKWISE,
-  AVOID
-} robot_state_t;
-
-typedef enum {
-  LEFT,
-  CENTER,
-  RIGHT
-} bumper_t;
-
-static float measure_distance ( uint16_t current_encoder, uint16_t previous_encoder ) {
-
-  // conversion from encoder ticks to meters
-  const float CONVERSION = 0.0006108;
-  // calculate result here and return it
-  float dist = current_encoder - previous_encoder;
-  if(dist > 65535/2){
-    dist -= 65535;
-  }
-  if(dist < -65535/2){
-    dist += 65535;
-  }
-  return dist * CONVERSION;
-}
 
 int main(void) {
   ret_code_t error_code = NRF_SUCCESS;
@@ -68,19 +38,30 @@ int main(void) {
   printf("Kobuki initialized!\n");
 
   // configure initial state
-  robot_state_t state = OFF;
-  bumper_t b_state = LEFT;
-  RomiSensors_t sensors = {0};
+  float front_close = 0.2;
+  float side_close = 1;//0.2;
+  float max_speed = 100;
 
-  uint16_t left_encoder_prev = 0;
-  uint16_t right_encoder_prev = 0;
-  float left_encoder_dist = 0;
-  float right_encoder_dist = 0;
+  // configure initial state
+  robot_state_t state = OFF;
+  bool button_pressed;
+  bool obs_detected;
+  bool obs_avoided;
+  bool in_tunnel;
+
+  bool turn_right;
+  float front_diff;
+  float back_diff;
+  int back_up_time = 20;
+  int turning_time = 10;
+  int back_up_counter;
+  int turning_counter;
+  RomiSensors_t sensors = {0};
 
   // loop forever, running state machine
   while (1) {
     // read sensors from robot
-    romiSensorPoll(&sensors);
+    read_sensors(&sensors);
 
     // delay before continuing
     // Note: removing this delay will make responses quicker, but will result
@@ -96,16 +77,16 @@ int main(void) {
           // right_encoder_prev = sensors.rightWheelEncoder;
           // left_encoder_dist = 0;
           // right_encoder_dist = 0;
-          state = DRIVING;
+          state = TELEOP;
         } else {
           // perform state-specific actions here
-          romiDriveDirect(0, 0);
+          set_speeds(0, 0);
           state = OFF;
         }
         break; // each case needs to end with break!
       }
 
-      case DRIVING: {
+      case TELEOP: {
         // transition logic
         if (is_button_pressed(&sensors)){
           state = OFF;
@@ -129,7 +110,7 @@ int main(void) {
         //   state = TURNING_CLOCKWISE;
         } else {
           // perform state-specific actions here
-          romiDriveDirect(75, 75);
+          set_speeds(75, 75);
 
           // char buf0 [16];
           // snprintf ( buf0 , 16 , "DRIVING LEFT %f", left_encoder_dist);
@@ -144,95 +125,11 @@ int main(void) {
           // left_encoder_prev = sensors.leftWheelEncoder;
           // right_encoder_prev = sensors.rightWheelEncoder;
 
-          state = DRIVING;
+          state = TELEOP;
         }
         break; // each case needs to end with break!
       }
 
-      // add other cases here
-      case TURNING_CLOCKWISE: {
-        // transition logic
-        if (is_button_pressed(&sensors)){
-          // lsm9ds1_stop_gyro_integration();
-          state = OFF;
-        // } else if (sensors.bumps_wheelDrops.bumpLeft || sensors.bumps_wheelDrops.bumpCenter || sensors.bumps_wheelDrops.bumpRight){
-        //   if(sensors.bumps_wheelDrops.bumpLeft){
-        //     b_state = LEFT;
-        //   } else if (sensors.bumps_wheelDrops.bumpCenter){
-        //     b_state = CENTER;
-        //   } else {
-        //     b_state = RIGHT;
-        //   }
-        //   lsm9ds1_stop_gyro_integration();
-        //   lsm9ds1_start_gyro_integration();
-        //   left_encoder_prev = sensors.leftWheelEncoder;
-        //   right_encoder_prev = sensors.rightWheelEncoder;
-        //   left_encoder_dist = 0;
-        //   right_encoder_dist = 0;   
-        //   state = AVOID;       
-        // } else if (lsm9ds1_read_gyro_integration().z_axis <= -90){
-        //   left_encoder_prev = sensors.leftWheelEncoder;
-        //   right_encoder_prev = sensors.rightWheelEncoder;
-        //   left_encoder_dist = 0;
-        //   right_encoder_dist = 0;
-        //   lsm9ds1_stop_gyro_integration();
-        //   state = DRIVING;
-
-        } else {
-          // perform state-specific actions here
-          romiDriveDirect(50, 0);
-          state = TURNING_CLOCKWISE;
-        }
-        break; // each case needs to end with break!
-      }
-
-      case AVOID: {
-        // transition logic
-        if (is_button_pressed(&sensors)){
-          // lsm9ds1_stop_gyro_integration();
-          state = OFF;
-        // } else if (sensors.bumps_wheelDrops.bumpLeft || sensors.bumps_wheelDrops.bumpCenter || sensors.bumps_wheelDrops.bumpRight){
-        //   if(sensors.bumps_wheelDrops.bumpLeft){
-        //     b_state = LEFT;
-        //   } else if (sensors.bumps_wheelDrops.bumpCenter){
-        //     b_state = CENTER;
-        //   } else {
-        //     b_state = RIGHT;
-        //   }
-        //   lsm9ds1_stop_gyro_integration();
-        //   lsm9ds1_start_gyro_integration();
-        //   left_encoder_prev = sensors.leftWheelEncoder;
-        //   right_encoder_prev = sensors.rightWheelEncoder;
-        //   left_encoder_dist = 0;
-        //   right_encoder_dist = 0;   
-        //   romiDriveDirect(-50, -50);
-        //   state = AVOID; 
-        // } else if (left_encoder_dist <= -0.1 && abs(lsm9ds1_read_gyro_integration().z_axis) >= 45){
-        //   left_encoder_prev = sensors.leftWheelEncoder;
-        //   right_encoder_prev = sensors.rightWheelEncoder;
-        //   left_encoder_dist = 0;
-        //   right_encoder_dist = 0;
-        //   lsm9ds1_stop_gyro_integration();
-        //   state = DRIVING;
-        // } else {
-        //   // perform state-specific actions here
-        //   if(left_encoder_dist > -0.1){
-        //     romiDriveDirect(-50, -50);
-        //     left_encoder_dist += measure_distance(sensors.leftWheelEncoder, left_encoder_prev);
-        //     left_encoder_prev = sensors.leftWheelEncoder;
-        //   } else{
-        //     if(b_state == LEFT){
-        //       romiDriveDirect(0, -50);
-        //     }
-        //     else{
-        //       romiDriveDirect(-50, 0);
-        //     }
-        //   }
-
-          state = AVOID;
-        }
-        break; // each case needs to end with break!
-      }
     }
   }
 }
