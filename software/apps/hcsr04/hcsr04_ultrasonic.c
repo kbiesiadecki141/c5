@@ -68,6 +68,7 @@ void GPIOTE_IRQHandler(void) {
     
     nrf_delay_ms(500);
 
+    printf("Finished interrupt \n");
     NVIC_EnableIRQ(GPIOTE_IRQn);
 }
 
@@ -76,14 +77,10 @@ float hcsr04_read_distance() {
     printf("Reading distance.... \n");
     // printf("trig %i", TRIG_PIN);
     gpio_clear(TRIG_PIN); // Clear trigger pin.
-    printf("cleared 1 \n");
     nrf_delay_us(10);
-    printf("setting 1 \n");
     gpio_set(TRIG_PIN);   // Set trigger pin to start measurement.
     nrf_delay_us(10);
-    printf("set 1 \n");
     gpio_clear(TRIG_PIN);
-    printf("cleared 1 \n");
     nrf_delay_us(10);
 
     __WFI();
