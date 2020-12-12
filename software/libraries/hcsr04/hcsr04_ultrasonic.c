@@ -76,10 +76,7 @@ void GPIOTE_IRQHandler(void) {
       // printf("Echo reads high to low \n"); 
       end_time = read_timer();
       //printf("end %ld\n", end_time);
-      diff_time = end_time - start_time;
       //printf("diff %ld\n", diff_time);
-      us_dist = diff_time * 340 / 2000000.;
-      printf("dist %f\n", us_dist);
     } 
     
     nrf_delay_us(10);
@@ -98,9 +95,12 @@ float hcsr04_read_distance() {
     nrf_delay_us(10);
     gpio_clear(TRIG_PIN);
     nrf_delay_us(10);
+    diff_time = end_time - start_time;
+    us_dist = diff_time * 340 / 2000000.;
+    // printf("dist %f\n", us_dist);
 
     __WFI();
-    return -1;
+    return us_dist;
 }
 
 

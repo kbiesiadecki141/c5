@@ -37,35 +37,45 @@ BOARD_VARS = \
 BOARD_SOURCES += \
 	app_error.c\
 	app_error_handler_gcc.c\
+	app_pwm.c\
 	app_scheduler.c\
 	app_timer.c\
 	app_uart.c\
 	app_util_platform.c\
 	before_startup.c\
+	ff.c\
 	hardfault_handler_gcc.c\
 	hardfault_implementation.c\
+	mmc_nrf.c\
 	nrf_assert.c\
 	nrf_atomic.c\
 	nrf_balloc.c\
+	nrf_drv_clock.c\
+	nrf_drv_ppi.c\
 	nrf_drv_spi.c\
 	nrf_drv_twi.c\
 	nrf_drv_uart.c\
 	nrf_fprintf.c\
 	nrf_fprintf_format.c\
+	nrf_fstorage.c\
 	nrf_log_backend_rtt.c\
 	nrf_log_backend_serial.c\
 	nrf_log_backend_uart.c\
 	nrf_log_default_backends.c\
 	nrf_log_frontend.c\
 	nrf_log_str_formatter.c\
+	nrf_memobj.c\
 	nrf_pwr_mgmt.c\
 	nrf_ringbuf.c\
-	nrf_memobj.c\
+	nrf_queue.c\
 	nrf_section_iter.c\
 	nrf_serial.c\
 	nrf_strerror.c\
-	nrf_queue.c\
+	nrf_twi_mngr.c\
+	nrfx_clock.c\
+	nrfx_ppi.c\
 	nrfx_prs.c\
+	nrfx_pwm.c\
 	nrfx_saadc.c\
 	nrfx_spi.c\
 	nrfx_spim.c\
@@ -78,8 +88,6 @@ BOARD_SOURCES += \
 	SEGGER_RTT_Syscalls_GCC.c\
 	SEGGER_RTT_printf.c\
 	simple_logger.c\
-	ff.c\
-	mmc_nrf.c\
 
 ifneq ($(SOFTDEVICE_MODEL),blank)
 BOARD_SOURCES += \

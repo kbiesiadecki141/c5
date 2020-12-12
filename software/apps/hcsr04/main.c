@@ -31,7 +31,7 @@ int main(void) {
   hcsr04_init(TRIG_PIN, ECHO_PIN); // trig pin, echo pin
 
   while(1) {
-    hcsr04_read_distance();
+    printf("dist %f\n", hcsr04_read_distance());
     nrf_delay_ms(1000);
   }
 }

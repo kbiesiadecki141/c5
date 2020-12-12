@@ -8,6 +8,9 @@ typedef enum {
   TUNNEL
 } robot_state_t;
 
+// INITIALIZATION
+void initialize_robot();
+
 // INPUTS
 void read_sensors(RomiSensors_t * sensors);
 
