@@ -28,7 +28,10 @@ bool obstacle_detected(RomiSensors_t * sensors, bool * turn_right){\
 }
 
 bool obstacle_avoided(RomiSensors_t * sensors, float front_close){
-	return hcsr04_read_distance() > front_close;
+  	float this_dist = hcsr04_read_distance();
+    printf("this_dist %f\n", this_dist);
+	return this_dist > front_close;
+	// return sensors->bumps_wheelDrops.bumpCenter;
 }
 
 float us_diff(RomiSensors_t * sensors, bool front){

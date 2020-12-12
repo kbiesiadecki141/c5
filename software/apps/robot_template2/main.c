@@ -1,6 +1,6 @@
 // Robot Template app
 //
-// Framework for creating applications that control the Kobuki robot
+// Framework for creating applications that control the Romi robot
 
 #include <math.h>
 #include <stdbool.h>
@@ -18,8 +18,8 @@
 #include "nrf_pwr_mgmt.h"
 #include "nrf_drv_spi.h"
 
-#include "romiFunctions.h"
 #include "romiUtilities.h"
+#include "romiFunctions.h"
 
 // I2C manager
 // NRF_TWI_MNGR_DEF(twi_mngr_instance, 5, 0);
@@ -33,14 +33,15 @@ int main(void) {
   NRF_LOG_DEFAULT_BACKENDS_INIT();
   printf("Log initialized!\n");
 
-  // initialize Kobuki
+  // initialize Romi
   romiInit();
-  printf("Kobuki initialized!\n");
+  initialize_robot();
+  printf("Romi initialized!\n");
 
-  // configure initial state
   float front_close = 0.2;
   float side_close = 1;//0.2;
   float max_speed = 100;
+  float turning_speed = max_speed/2;
 
   // configure initial state
   robot_state_t state = OFF;
@@ -53,7 +54,7 @@ int main(void) {
   float front_diff;
   float back_diff;
   int back_up_time = 20;
-  int turning_time = 10;
+  int turning_time = 0;
   int back_up_counter;
   int turning_counter;
   RomiSensors_t sensors = {0};
@@ -62,6 +63,12 @@ int main(void) {
   while (1) {
     // read sensors from robot
     read_sensors(&sensors);
+    button_pressed = is_button_pressed(&sensors);
+    obs_detected = obstacle_detected(&sensors, &turn_right);
+    obs_avoided = obstacle_avoided(&sensors, front_close);
+    // nrf_delay_ms(1000);
+    // printf("obstacle_avoided %d\n", obs_avoided);
+    in_tunnel = inside_tunnel(&sensors, side_close);
 
     // delay before continuing
     // Note: removing this delay will make responses quicker, but will result
@@ -72,15 +79,11 @@ int main(void) {
     switch(state) {
       case OFF: {
         // transition logic
-        if (is_button_pressed(&sensors)) {
-          // left_encoder_prev = sensors.leftWheelEncoder;
-          // right_encoder_prev = sensors.rightWheelEncoder;
-          // left_encoder_dist = 0;
-          // right_encoder_dist = 0;
-          state = TELEOP;
+        if (button_pressed) {
+          state = TUNNEL;
         } else {
           // perform state-specific actions here
-          set_speeds(0, 0);
+          stop();
           state = OFF;
         }
         break; // each case needs to end with break!
@@ -88,49 +91,78 @@ int main(void) {
 
       case TELEOP: {
         // transition logic
-        if (is_button_pressed(&sensors)){
+        if (button_pressed) {
           state = OFF;
-        // } else if (sensors.bumps_wheelDrops.bumpLeft || sensors.bumps_wheelDrops.bumpCenter || sensors.bumps_wheelDrops.bumpRight){
-        //   if(sensors.bumps_wheelDrops.bumpLeft){
-        //     b_state = LEFT;
-        //   } else if (sensors.bumps_wheelDrops.bumpCenter){
-        //     b_state = CENTER;
-        //   } else {
-        //     b_state = RIGHT;
-        //   }
-        //   lsm9ds1_stop_gyro_integration();
-        //   lsm9ds1_start_gyro_integration();
-        //   left_encoder_prev = sensors.leftWheelEncoder;
-        //   right_encoder_prev = sensors.rightWheelEncoder;
-        //   left_encoder_dist = 0;
-        //   right_encoder_dist = 0;   
-        //   state = AVOID; 
-        // } else if (left_encoder_dist >= 0.2 || right_encoder_dist >= 0.2) {
-        //   lsm9ds1_start_gyro_integration();
-        //   state = TURNING_CLOCKWISE;
+        } else if (obs_detected) {
+          state = AVOID;
+          back_up_counter = 0;
+        } else if (in_tunnel) {
+          state = TUNNEL;
         } else {
           // perform state-specific actions here
-          set_speeds(75, 75);
-
-          // char buf0 [16];
-          // snprintf ( buf0 , 16 , "DRIVING LEFT %f", left_encoder_dist);
-          // display_write ( buf0 , DISPLAY_LINE_0 ) ;
-          // char buf1 [16];
-          // snprintf ( buf1 , 16 , "DRIVING RIGHT %f", right_encoder_dist);
-          // display_write ( buf1 , DISPLAY_LINE_1 ) ;
-
-          // left_encoder_dist += measure_distance(sensors.leftWheelEncoder, left_encoder_prev);
-          // right_encoder_dist += measure_distance(sensors.rightWheelEncoder, right_encoder_prev);
-
-          // left_encoder_prev = sensors.leftWheelEncoder;
-          // right_encoder_prev = sensors.rightWheelEncoder;
-
+          set_speeds(max_speed, max_speed);
           state = TELEOP;
         }
         break; // each case needs to end with break!
       }
 
+      case AVOID: {
+        // transition logic
+        if (button_pressed) {
+          state = OFF;
+        } else if (obs_avoided) {
+          if (in_tunnel) {
+            state = TUNNEL;
+          } else {
+            state = TELEOP;
+          }
+        } else {
+          // perform state-specific actions here
+          if (back_up_counter < back_up_time) {
+            back_up_counter = back_up_counter + 1;
+            set_speeds(-max_speed, -max_speed);
+          } else {
+            if (!(obs_detected) && obs_avoided) {
+              turning_counter = 0;
+            } else {
+              turning_counter = turning_counter + 1;
+            }
+            if (turn_right) {
+              set_speeds(turning_speed, -turning_speed);
+            } else {
+              set_speeds(-turning_speed, turning_speed);
+            }
+          }
+          state = AVOID;
+        }
+        break; // each case needs to end with break!
+      }
+
+      case TUNNEL:{
+        // transition logic
+        if (button_pressed) {
+          state = OFF;
+        } else if (obs_detected) {
+          state = AVOID;
+          back_up_counter = 0;
+        } else if (! in_tunnel) {
+          state = TELEOP;
+        } else {
+          // perform state-specific actions here
+
+          front_diff = us_diff(&sensors, true);
+          back_diff = us_diff(&sensors, false);
+          //printf("Cliff diff: %lf\n", front_diff);
+
+          set_speeds(max_speed/2 * (1 - front_diff / side_close), max_speed/2 * (1 + front_diff / side_close));
+          
+          state = TUNNEL;
+        }
+        break; // each case needs to end with break!
+
+      }
     }
+    // nrf_delay_ms(1000);
   }
 }
 

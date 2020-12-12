@@ -18,6 +18,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "hcsr04_ultrasonic.h"
+#include "romiFunctions.h"
 //#include "app_util.h"
 #include "nrf_delay.h"
 
@@ -30,8 +31,11 @@ int main(void) {
 
   hcsr04_init(TRIG_PIN, ECHO_PIN); // trig pin, echo pin
 
+  RomiSensors_t sensors = {0};
+  float front_close = 0.2;
+
   while(1) {
-    printf("dist %f\n", hcsr04_read_distance());
+    printf("obstacle_avoided %d\n", obstacle_avoided(&sensors, front_close));
     nrf_delay_ms(1000);
   }
 }
