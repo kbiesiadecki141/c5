@@ -119,7 +119,7 @@ static void pwm_init(void)
         {
             REAR_RIGHT_A | NRF_DRV_PWM_PIN_INVERTED, // channel 0 // move forward by default
             REAR_LEFT_B | NRF_DRV_PWM_PIN_INVERTED, // channel 1
-            RR_A NRF_DRV_PWM_PIN_INVERTED, // channel 2
+            RR_A | NRF_DRV_PWM_PIN_INVERTED, // channel 2
             RL_B | NRF_DRV_PWM_PIN_INVERTED // channel 3
         },
         .irq_priority = APP_IRQ_PRIORITY_LOWEST,
@@ -133,13 +133,54 @@ static void pwm_init(void)
     APP_ERROR_CHECK(nrf_drv_pwm_init(&m_pwm0, &config0, NULL));
 }
 
+
+static void pwm_init_led(void)
+{
+    nrf_drv_pwm_config_t const config0 =
+    {
+        .output_pins =
+        {
+            OUTPUT_PIN | NRF_DRV_PWM_PIN_INVERTED, // channel 0 //
+            NRF_DRV_PWM_PIN_NOT_USED, // channel 1
+            NRF_DRV_PWM_PIN_NOT_USED, // channel 2
+            NRF_DRV_PWM_PIN_NOT_USED // channel 3
+        },
+        .irq_priority = APP_IRQ_PRIORITY_LOWEST,
+        .base_clock   = NRF_PWM_CLK_1MHz,
+        .count_mode   = NRF_PWM_MODE_UP,
+        .top_value    = 100,
+        .load_mode    = NRF_PWM_LOAD_INDIVIDUAL,
+        .step_mode    = NRF_PWM_STEP_AUTO
+    };
+    // Init PWM without error handler
+    APP_ERROR_CHECK(nrf_drv_pwm_init(&m_pwm0, &config0, NULL));
+}
+
+// Set duty cycle between 0 and 100%
+void pwm_update_duty_cycle_led(uint8_t duty_cycle, bool direction)
+{
+    // Move forward by default with REAR_RIGHT_A and REAR_LEFT_B
+    if (duty_cycle >= 100) {
+            seq_values->channel_0 = 100 | 0x8000;
+            seq_values->channel_1 = 100 | 0x8000;
+        } else {
+            seq_values->channel_0 = duty_cycle | 0x8000;
+            seq_values->channel_1 = duty_cycle | 0x8000;
+        }
+    
+    // potentially have different sequences for backwards/forwards
+    nrf_drv_pwm_simple_playback(&m_pwm0, &seq, 3, NRF_DRV_PWM_FLAG_LOOP);
+    nrf_drv_pwm_simple_playback(&m_pwm1, &seq, 3, NRF_DRV_PWM_FLAG_LOOP);
+    nrf_drv_pwm_simple_playback(&m_pwm2, &seq, 3, NRF_DRV_PWM_FLAG_LOOP);
+}
+
 static void pwm_init3(void)
 {
     nrf_drv_pwm_config_t const config0 =
     {
         .output_pins =
         {
-            OUTPUT_PIN_2, // channel 0 // move forward by default
+            OUTPUT_PIN_2 | NRF_DRV_PWM_PIN_INVERTED, // channel 0 // move forward by default
             NRF_DRV_PWM_PIN_NOT_USED,
             NRF_DRV_PWM_PIN_NOT_USED,
             NRF_DRV_PWM_PIN_NOT_USED
@@ -161,7 +202,7 @@ static void pwm_init2(void)
     {
         .output_pins =
         {
-            OUTPUT_PIN_3, // channel 0 // move forward by default
+            OUTPUT_PIN_3 | NRF_DRV_PWM_PIN_INVERTED, // channel 0 // move forward by default
             NRF_DRV_PWM_PIN_NOT_USED,
             NRF_DRV_PWM_PIN_NOT_USED,
             NRF_DRV_PWM_PIN_NOT_USED
