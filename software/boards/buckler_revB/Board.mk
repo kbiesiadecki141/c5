@@ -79,7 +79,6 @@ BOARD_SOURCES += \
 	nrfx_gpiote.c\
 	nrfx_ppi.c\
 	nrfx_prs.c\
-	nrfx_pwm.c\
 	nrfx_saadc.c\
 	nrfx_spi.c\
 	nrfx_spim.c\
