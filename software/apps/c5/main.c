@@ -35,6 +35,7 @@ int main(void) {
 
   // initialize Romi
   romiInit();
+  initialize_robot();
   printf("Romi initialized!\n");
 
   float front_close = 0.2;
