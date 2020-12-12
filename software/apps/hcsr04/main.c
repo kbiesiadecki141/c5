@@ -32,7 +32,7 @@ int main(void) {
 
   while(1) {
     hcsr04_read_distance();
-    nrf_delay_ms(5000);
+    nrf_delay_ms(1000);
   }
 }
 
