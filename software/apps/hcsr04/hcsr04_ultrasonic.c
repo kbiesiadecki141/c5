@@ -11,7 +11,7 @@
 ////////////////////////////////////////////////////
 
 #include "app_error.h"
-#include "buckler.h"
+//#include "buckler.h"
 #include "gpio.h"
 #include "time.h"
 #include "nrf_gpio.h"
@@ -20,8 +20,8 @@
 
 #define timeout 30000	// ultrasonic sensor timeout
 
-static int TRIG_PIN;
-static int ECHO_PIN;
+int TRIG_PIN;
+int ECHO_PIN;
 
 ret_code_t hcsr04_init(const int trig_pin, const int echo_pin) {
 
@@ -74,12 +74,17 @@ void GPIOTE_IRQHandler(void) {
 
 float hcsr04_read_distance() {
     printf("Reading distance.... \n");
+    printf("trig %f", TRIG_PIN);
     gpio_clear(TRIG_PIN); // Clear trigger pin.
-    nrf_delay_us(10);
-    gpio_set(TRIG_PIN);   // Set trigger pin to start measurement.
-    nrf_delay_us(10);
-    gpio_clear(TRIG_PIN);
-    nrf_delay_us(10);
+    printf("cleared 1 \n");
+    nrf_delay_ms(1000);
+    // printf("setting 1 \n");
+    // gpio_set(TRIG_PIN);   // Set trigger pin to start measurement.
+    // nrf_delay_ms(10);
+    // printf("set 1 \n");
+    // gpio_clear(TRIG_PIN);
+    // printf("cleared 1 \n");
+    // nrf_delay_ms(10);
 
     __WFI();
     return -1;
