@@ -122,6 +122,7 @@ void pwm_init(nrf_drv_pwm_t * m_pwm, int one, int two, int three, int four)
     nrf_drv_pwm_config_t const config =
     {
         .output_pins = { one, two, three, four }, // channel 1-4
+
         .irq_priority = APP_IRQ_PRIORITY_LOWEST,
         .base_clock   = NRF_PWM_CLK_1MHz,
         .count_mode   = NRF_PWM_MODE_UP,
@@ -131,6 +132,7 @@ void pwm_init(nrf_drv_pwm_t * m_pwm, int one, int two, int three, int four)
     };
       
     // Init PWM without error handler
+
     printf("init %02x \n", m_pwm);
     APP_ERROR_CHECK(nrf_drv_pwm_init(m_pwm, &config, NULL));
 }

@@ -18,7 +18,8 @@
 #include "nrf_pwr_mgmt.h"
 #include "nrf_drv_spi.h"
 
-#include "c5Functions.h"
+#include "romiUtilities.h"
+#include "romiFunctions.h"
 
 // I2C manager
 // NRF_TWI_MNGR_DEF(twi_mngr_instance, 5, 0);
@@ -32,6 +33,11 @@ int main(void) {
   APP_ERROR_CHECK(error_code);
   NRF_LOG_DEFAULT_BACKENDS_INIT();
   printf("Log initialized!\n");
+
+  // initialize Romi
+  romiInit();
+  // initialize_robot();
+  printf("Romi initialized!\n");
 
   float front_close = 0.2;
   float side_close = 1;//0.2;
@@ -51,17 +57,17 @@ int main(void) {
   int turning_time = 20;
   int back_up_counter;
   int turning_counter;
-  C5Sensors_t sensors = {0};
+  RomiSensors_t sensors = {0};
 
   // loop forever, running state machine
   while (1) {
     // read sensors from robot
-    c5_read_sensors(&sensors);
-    button_pressed = c5_is_button_pressed(&sensors);
-    obs_detected = c5_obstacle_detected(&sensors, &turn_right);
-    obs_avoided = !(obs_detected) && c5_obstacle_avoided(&sensors, front_close);
+    read_sensors(&sensors);
+    button_pressed = is_button_pressed(&sensors);
+    obs_detected = obstacle_detected(&sensors, &turn_right);
+    obs_avoided = !(obs_detected) && obstacle_avoided(&sensors, front_close);
     // nrf_delay_ms(1000);
-    in_tunnel = c5_inside_tunnel(&sensors, side_close);
+    in_tunnel = inside_tunnel(&sensors, side_close);
 
     // delay before continuing
     // Note: removing this delay will make responses quicker, but will result
@@ -77,7 +83,7 @@ int main(void) {
           printf("TELEOP\n");
         } else {
           // perform state-specific actions here
-          c5_stop();
+          stop();
           state = OFF;
         }
         break; // each case needs to end with break!
@@ -88,7 +94,7 @@ int main(void) {
         if (button_pressed) {
           state = OFF;
         } else if (obs_detected) {
-          c5_set_speeds(-max_speed, -max_speed);
+          set_speeds(-max_speed, -max_speed);
           state = AVOID;
           printf("AVOID\n");
           back_up_counter = 0;
@@ -97,7 +103,7 @@ int main(void) {
           printf("TUNNEL\n");
         } else {
           // perform state-specific actions here
-          c5_set_speeds(max_speed, max_speed);
+          set_speeds(max_speed, max_speed);
           state = TELEOP;
         }
         break; // each case needs to end with break!
@@ -123,7 +129,7 @@ int main(void) {
           // perform state-specific actions here
           if (back_up_counter < back_up_time) {
             back_up_counter = back_up_counter + 1;
-            c5_set_speeds(-max_speed, -max_speed);
+            set_speeds(-max_speed, -max_speed);
           } else {
             if (obs_avoided) {
               turning_counter = turning_counter + 1;
@@ -131,9 +137,9 @@ int main(void) {
               turning_counter = 0;
             }
             if (turn_right) {
-              c5_set_speeds(turning_speed, -turning_speed);
+              set_speeds(turning_speed, -turning_speed);
             } else {
-              c5_set_speeds(-turning_speed, turning_speed);
+              set_speeds(-turning_speed, turning_speed);
             }
           }
           state = AVOID;
@@ -146,7 +152,7 @@ int main(void) {
         if (button_pressed) {
           state = OFF;
         } else if (obs_detected) {
-          c5_set_speeds(-max_speed, -max_speed);
+          set_speeds(-max_speed, -max_speed);
           state = AVOID;
           printf("AVOID\n");
           back_up_counter = 0;
@@ -156,10 +162,10 @@ int main(void) {
         } else {
           // perform state-specific actions here
 
-          side_diff = c5_us_diff(&sensors);
+          side_diff = us_diff(&sensors);
           //printf("Cliff diff: %lf\n", front_diff);
 
-          c5_set_speeds(max_speed/2 * (1 + side_diff / side_close), max_speed/2 * (1 - side_diff / side_close));
+          set_speeds(max_speed/2 * (1 - side_diff / side_close), max_speed/2 * (1 + side_diff / side_close));
           
           state = TUNNEL;
         }

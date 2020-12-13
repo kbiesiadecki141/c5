@@ -68,7 +68,7 @@
 /* Fixups for GPIOTE HAL and driver. */
 #define NRF_GPIOTE        NRF_GPIOTE0_S
 #define GPIOTE_IRQn       GPIOTE0_IRQn
-#define GPIOTE_IRQHandler GPIOTE0_IRQHandler
+//#define GPIOTE_IRQHandler GPIOTE0_IRQHandler
 
 // <<< Use Configuration Wizard in Context Menu >>>\n
 
