@@ -44,12 +44,12 @@ APP_PWM_INSTANCE(m_pwm, 1);
 // 20000 is another nice-sounding frequency
 #define FREQ_IN_US  5000
 
-#define ENABLE_PIN_A   12  // this pin is connected with enable 1 pin of L298N module
-#define ENABLE_PIN_B   17  // this pin is connected with enable 2 pin of L298N module
-#define INPUT_1   13  // this pin is connected with IN1
-#define INPUT_2   14  // this pin is connected with IN2
-#define INPUT_3   15  // this pin is connected with IN3
-#define INPUT_4   16  // this pin is connected with IN4
+#define ENABLE_PIN_A   19  // this pin is connected with enable 1 pin of L298N module
+#define ENABLE_PIN_B   25  // this pin is connected with enable 2 pin of L298N module
+#define INPUT_1   20  // this pin is connected with IN1
+#define INPUT_2   22  // this pin is connected with IN2
+#define INPUT_3   23  // this pin is connected with IN3
+#define INPUT_4   24  // this pin is connected with IN4
 
 #define FRONT_LEFT_A    12  // this pin is connected with enable 1 pin of L298N module
 #define FRONT_RIGHT_B   17  // this pin is connected with enable 2 pin of L298N module
@@ -77,9 +77,9 @@ int main(void)
     // set direction to clockwise
     // wiring is slightly off for bogies: set: 1, 3 and clear: 2, 4
     nrf_gpio_pin_set(INPUT_1);  
-    nrf_gpio_pin_clear(INPUT_2); 
-    nrf_gpio_pin_set(INPUT_3);  
-    nrf_gpio_pin_clear(INPUT_4);
+    nrf_gpio_pin_clear(INPUT_3); 
+    nrf_gpio_pin_set(INPUT_4);  
+    nrf_gpio_pin_clear(INPUT_2);
 
     ret_code_t err_code; // a variable to hold error value
 
