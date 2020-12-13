@@ -53,12 +53,12 @@ static uint8_t m_used = 0;
 // 5000, 20000 is another nice-sounding frequency
 #define FREQ_IN_US 5000
 
-#define REAR_RIGHT_A   25  // this pin is connected with enable A pin of L298N module
-#define REAR_LEFT_B    19  // this pin is connected with enable B pin of L298N module
-#define RL_A1   24  // Rear Left channel 1, driven by ENA
-#define RL_A2   23  // Rear Left channel 2
-#define RR_B1   22  // Rear Right channel 1, driven by ENB
-#define RR_B2   20  // Rear Right channel 2
+#define REAR_RIGHT_A   19  // this pin is connected with enable A pin of L298N module
+#define REAR_LEFT_B    25  // this pin is connected with enable B pin of L298N module
+#define RL_A1   20  // Rear Left channel 1, driven by ENA
+#define RL_A2   22  // Rear Left channel 2
+#define RR_B1   23  // Rear Right channel 1, driven by ENB
+#define RR_B2   24  // Rear Right channel 2
 
 #define FRONT_LEFT_A    12  // this pin is connected with enable A pin of L298N module
 #define FRONT_LEFT_B   17  // this pin is connected with enable B pin of L298N module
