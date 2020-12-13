@@ -1,76 +1,57 @@
 #include "c5Functions.h"
 
 // INPUTS
-static bool read_button(){
+static bool c5_read_button(){
 	// TODO
 	return false;
 }
 
-static float read_us(bool front, bool right, bool back){
-	// TODO
-	return 0;
-}
-
-static bool read_bump(bool right, bool front){
+static bool c5_read_bump(bool right, bool front){
 	// TODO
 	return false;
 }
 
-static void read_sensors(C5Sensors_t * sensors){
-	sensors->button = read_button();
+void c5_read_sensors(C5Sensors_t * sensors){
+	sensors->button = c5_read_button();
 
-    sensors->us_f = read_us(true, false, false);
-    sensors->us_rf = read_us(false, true, false);
-    sensors->us_lf = read_us(false, false, false);
-    sensors->us_rb = read_us(false, true, true);
-    sensors->us_lb = read_us(false, false, true);
+    sensors->us_f = hcsr04_read_distance(TRIG_F, ECHO_F);
+    sensors->us_rf = hcsr04_read_distance(TRIG_RF, ECHO_RF);
+    sensors->us_lf = hcsr04_read_distance(TRIG_LF, ECHO_LF);
+    sensors->us_rb = hcsr04_read_distance(TRIG_RB, ECHO_RB);
+    sensors->us_lb = hcsr04_read_distance(TRIG_LB, ECHO_LB);
 
-    sensors->bump_r = read_bump(true, false);
-    sensors->bump_cr = read_bump(true, true);
-    sensors->bump_cl = read_bump(false, true);
-    sensors->bump_l = read_bump(false, false);
+    sensors->bump_r = c5_read_bump(true, false);
+    sensors->bump_cr = c5_read_bump(true, true);
+    sensors->bump_cl = c5_read_bump(false, true);
+    sensors->bump_l = c5_read_bump(false, false);
 }
 
 // FUNCTIONS
+bool c5_is_button_pressed(C5Sensors_t * sensors){
+	return sensors->button;
+}
 
-static bool in_tunnel(C5Sensors_t * sensors, float side_close){
+bool c5_inside_tunnel(C5Sensors_t * sensors, float side_close){
 	return (sensors->us_rf < side_close) && (sensors->us_lf < side_close) && (sensors->us_rb < side_close) && (sensors->us_lb < side_close);
 }
 
-static bool obstacle_detected(C5Sensors_t * sensors){
+bool c5_obstacle_detected(C5Sensors_t * sensors, bool * turn_right){
 	return sensors->bump_r || sensors->bump_cr || sensors->bump_cl || sensors->bump_l;
 }
 
-static bool obstacle_avoided(C5Sensors_t * sensors, float front_close){
+bool c5_obstacle_avoided(C5Sensors_t * sensors, float front_close){
 	return sensors->us_f >= front_close;
 }
 
-static float us_diff(C5Sensors_t * sensors, bool front){
-	if(front){
-		return sensors->us_lf - sensors->us_rf;
-	}
-	return sensors->us_lb - sensors->us_rb;
+float c5_us_diff(C5Sensors_t * sensors){
+	return (sensors->us_lb - sensors->us_lf) - (sensors->us_rb - sensors->us_rf);
 }
 
 // OUTPUTS
-static void set_wheel_speed(bool right, int wheel_num, int speed){
+void c5_set_speeds(int left, int right){
 	// TODO
-	// 0: front
-	// 1: middle
-	// 2: back
 }
 
-static void set_speed(bool right, int speed){
-	for(int i = 0; i < 3; i++){
-		set_wheel_speed(right, i, speed);
-	}
-}
-
-static void set_speeds(int left, int right){
-	set_speed(false, left);
-	set_speed(true, right);
-}
-
-static void stop(){
-	set_speeds(0, 0);
+void c5_stop(){
+	c5_set_speeds(0, 0);
 }
