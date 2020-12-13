@@ -18,8 +18,8 @@
 #include "nrf_pwr_mgmt.h"
 #include "nrf_drv_spi.h"
 
-#include "romiUtilities.h"
-#include "romiFunctions.h"
+#include "c5Utilities.h"
+#include "c5Functions.h"
 
 // I2C manager
 // NRF_TWI_MNGR_DEF(twi_mngr_instance, 5, 0);
@@ -32,11 +32,6 @@ int main(void) {
   APP_ERROR_CHECK(error_code);
   NRF_LOG_DEFAULT_BACKENDS_INIT();
   printf("Log initialized!\n");
-
-  // initialize Romi
-  romiInit();
-  initialize_robot();
-  printf("Romi initialized!\n");
 
   float front_close = 0.2;
   float side_close = 1;//0.2;
@@ -64,7 +59,7 @@ int main(void) {
     read_sensors(&sensors);
     button_pressed = is_button_pressed(&sensors);
     obs_detected = obstacle_detected(&sensors, &turn_right);
-    obs_avoided = obstacle_avoided(&sensors, front_close);
+    obs_avoided = !(obs_detected) && obstacle_avoided(&sensors, front_close);
     in_tunnel = inside_tunnel(&sensors, side_close);
 
     // delay before continuing
@@ -107,7 +102,7 @@ int main(void) {
         // transition logic
         if (button_pressed) {
           state = OFF;
-        } else if (!(obs_detected) && obs_avoided && turning_counter >= turning_time) {
+        } else if (obs_avoided && turning_counter >= turning_time) {
           if (in_tunnel) {
             state = TUNNEL;
           } else {
@@ -119,7 +114,7 @@ int main(void) {
             back_up_counter = back_up_counter + 1;
             set_speeds(-max_speed, -max_speed);
           } else {
-            if (!(obs_detected) && obs_avoided) {
+            if (obs_avoided) {
               turning_counter = 0;
             } else {
               turning_counter = turning_counter + 1;
