@@ -52,7 +52,7 @@ static uint8_t m_used = 0;
 #define UNUSED_PIN NRF_DRV_PWM_PIN_NOT_USED
 // define the pwm time period for pwm wave
 // 5000, 20000 is another nice-sounding frequency
-#define FREQ_IN_US 5000
+#define FREQ_IN_US 20000
 
 #define REAR_RIGHT_A   19  // this pin is connected with enable A pin of L298N module
 #define REAR_LEFT_B    25  // this pin is connected with enable B pin of L298N module
@@ -61,12 +61,12 @@ static uint8_t m_used = 0;
 #define RR_B1   23  // Rear Right channel 1, driven by ENB
 #define RR_B2   24  // Rear Right channel 2
 
-#define FRONT_LEFT_A    12  // this pin is connected with enable A pin of L298N module
-#define FRONT_LEFT_B   17  // this pin is connected with enable B pin of L298N module
-#define FL_A1  13  // Front Left Bogie A channel 1, driven by ENA
-#define FL_A2  14  // Front Left Bogie A channel 2
-#define FL_B1  15  // Front Left Bogie B channel 1, driven by ENB
-#define FL_B2  16  // Front Left Bogie B channel 2
+#define FRONT_LEFT_A    13  // this pin is connected with enable A pin of L298N module
+#define FRONT_LEFT_B   18  // this pin is connected with enable B pin of L298N module
+#define FL_A1  14  // Front Left Bogie A channel 1, driven by ENA
+#define FL_A2  15  // Front Left Bogie A channel 2
+#define FL_B1  16  // Front Left Bogie B channel 1, driven by ENB
+#define FL_B2  17  // Front Left Bogie B channel 2
 
 #define FRONT_RIGHT_A    10  // this pin is connected with enable A pin of L298N module
 #define FRONT_RIGHT_B     5  // this pin is connected with enable B pin of L298N module
@@ -76,10 +76,10 @@ static uint8_t m_used = 0;
 #define FR_B2  6  // Front Right Bogie B channel 2
 
 // On-board LEDs test example
-#define OUTPUT_PIN 17
-#define OUTPUT_PIN_2 18
-#define OUTPUT_PIN_3 19
-#define OUTPUT_PIN_4 20
+// #define OUTPUT_PIN 17
+// #define OUTPUT_PIN_2 18
+// #define OUTPUT_PIN_3 19
+// #define OUTPUT_PIN_4 20
 
 // Declare variables holding PWM sequence values. In this example only one channel is used 
 nrf_pwm_values_individual_t seq_values[] = {0, 0, 0, 0};
@@ -156,21 +156,22 @@ int main(void)
     
     pwm_init(&m_pwm0, FRONT_LEFT_A,
                         FRONT_LEFT_B, 
-                        FL_A2,
-                        FL_B2);
+                        FL_A2 | NRF_DRV_PWM_PIN_INVERTED,
+                        FL_B2 | NRF_DRV_PWM_PIN_INVERTED);
 
     pwm_init(&m_pwm1, FRONT_RIGHT_A,
                         FRONT_RIGHT_B, 
-                        FR_A1,
-                        FR_B1);
+                        FR_A1 | NRF_DRV_PWM_PIN_INVERTED,
+                        FR_B1 | NRF_DRV_PWM_PIN_INVERTED);
+
     // forward: FRONT_RIGHT_A, FRONT_RIGHT_B, FR_A1, FR_B1
 
     // CANNOT USE PIN 11
 
     pwm_init(&m_pwm2, REAR_RIGHT_A,
                         REAR_LEFT_B, 
-                        RL_A1,
-                        RR_B1);
+                        RL_A1 | NRF_DRV_PWM_PIN_INVERTED,
+                        RR_B1 | NRF_DRV_PWM_PIN_INVERTED);
 
     for (;;)
     {
