@@ -161,9 +161,11 @@ int main(void)
 
     pwm_init(&m_pwm1, FRONT_RIGHT_A,
                         FRONT_RIGHT_B, 
-                        FR_A2,
-                        FR_B2);
-    // Tried: A2, B2;
+                        FR_A1,
+                        FR_B1);
+    // forward: FRONT_RIGHT_A, FRONT_RIGHT_B, FR_A1, FR_B1
+
+    // CANNOT USE PIN 11
 
     pwm_init(&m_pwm2, REAR_RIGHT_A,
                         REAR_LEFT_B, 
