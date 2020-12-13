@@ -34,7 +34,7 @@ bool obstacle_avoided(RomiSensors_t * sensors, float front_close){
 	// return sensors->bumps_wheelDrops.bumpCenter;
 }
 
-float us_diff(RomiSensors_t * sensors, bool front){
+float us_diff(RomiSensors_t * sensors){
 	return sensors->cliffLeft - sensors->cliffRight;
 }
 

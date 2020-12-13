@@ -52,10 +52,9 @@ int main(void) {
   bool in_tunnel;
 
   bool turn_right;
-  float front_diff;
-  float back_diff;
+  float side_diff;
   int back_up_time = 20;
-  int turning_time = 0;
+  int turning_time = 20;
   int back_up_counter;
   int turning_counter;
   RomiSensors_t sensors = {0};
@@ -66,7 +65,7 @@ int main(void) {
     read_sensors(&sensors);
     button_pressed = is_button_pressed(&sensors);
     obs_detected = obstacle_detected(&sensors, &turn_right);
-    obs_avoided = obstacle_avoided(&sensors, front_close);
+    obs_avoided = !(obs_detected) && obstacle_avoided(&sensors, front_close);
     // nrf_delay_ms(1000);
     in_tunnel = inside_tunnel(&sensors, side_close);
 
@@ -118,7 +117,7 @@ int main(void) {
         printf("turning_counter %d\n", turning_counter);
         if (button_pressed) {
           state = OFF;
-        } else if (!(obs_detected) && obs_avoided && back_up_counter >= back_up_time && turning_counter >= turning_time) {
+        } else if (obs_avoided && back_up_counter >= back_up_time && turning_counter >= turning_time) {
           if (in_tunnel) {
             state = TUNNEL;
             printf("TUNNEL\n");
@@ -132,10 +131,10 @@ int main(void) {
             back_up_counter = back_up_counter + 1;
             set_speeds(-max_speed, -max_speed);
           } else {
-            if (!(obs_detected) && obs_avoided) {
-              turning_counter = 0;
-            } else {
+            if (obs_avoided) {
               turning_counter = turning_counter + 1;
+            } else {
+              turning_counter = 0;
             }
             if (turn_right) {
               set_speeds(turning_speed, -turning_speed);
@@ -163,11 +162,10 @@ int main(void) {
         } else {
           // perform state-specific actions here
 
-          front_diff = us_diff(&sensors, true);
-          back_diff = us_diff(&sensors, false);
+          side_diff = us_diff(&sensors);
           //printf("Cliff diff: %lf\n", front_diff);
 
-          set_speeds(max_speed/2 * (1 - front_diff / side_close), max_speed/2 * (1 + front_diff / side_close));
+          set_speeds(max_speed/2 * (1 - side_diff / side_close), max_speed/2 * (1 + side_diff / side_close));
           
           state = TUNNEL;
         }
