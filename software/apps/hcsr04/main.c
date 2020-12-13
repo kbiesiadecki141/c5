@@ -29,13 +29,15 @@ int main(void) {
   // Initialize
   printf("Ultrasonic Sensor App. \n");
 
-  hcsr04_init(TRIG_PIN, ECHO_PIN); // trig pin, echo pin
+  // hcsr04_init(TRIG_PIN, ECHO_PIN); // trig pin, echo pin
 
-  RomiSensors_t sensors = {0};
-  float front_close = 0.2;
+  // RomiSensors_t sensors = {0};
+  // float front_close = 0.2;
 
   while(1) {
-    printf("obstacle_avoided %d\n", obstacle_avoided(&sensors, front_close));
+  	float this_dist = hcsr04_read_distance(TRIG_PIN, ECHO_PIN);
+    printf("this_dist %f\n", this_dist);
+    // printf("obstacle_avoided %d\n", obstacle_avoided(&sensors, front_close));
     nrf_delay_ms(1000);
   }
 }
