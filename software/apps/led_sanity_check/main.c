@@ -54,6 +54,27 @@ static uint8_t m_used = 0;
 // 5000, 20000 is another nice-sounding frequency
 #define FREQ_IN_US 5000
 
+#define REAR_RIGHT_A   19  // this pin is connected with enable A pin of L298N module
+#define REAR_LEFT_B    25  // this pin is connected with enable B pin of L298N module
+#define RL_A1   20  // Rear Left channel 1, driven by ENA
+#define RL_A2   22  // Rear Left channel 2
+#define RR_B1   23  // Rear Right channel 1, driven by ENB
+#define RR_B2   24  // Rear Right channel 2
+
+#define FRONT_LEFT_A    12  // this pin is connected with enable A pin of L298N module
+#define FRONT_LEFT_B   17  // this pin is connected with enable B pin of L298N module
+#define FL_A1  13  // Front Left Bogie A channel 1, driven by ENA
+#define FL_A2  14  // Front Left Bogie A channel 2
+#define FL_B1  15  // Front Left Bogie B channel 1, driven by ENB
+#define FL_B2  16  // Front Left Bogie B channel 2
+
+#define FRONT_RIGHT_A    10  // this pin is connected with enable A pin of L298N module
+#define FRONT_RIGHT_B     5  // this pin is connected with enable B pin of L298N module
+#define FR_A1  9  // Front Right Bogie A channel 1
+#define FR_A2  8  // Front Right Bogie A channel 2
+#define FR_B1  7  // Front Right Bogie B channel 1
+#define FR_B2  6  // Front Right Bogie B channel 2
+
 // On-board LEDs test example
 #define OUTPUT_PIN 17
 #define OUTPUT_PIN_2 18
@@ -127,21 +148,27 @@ int main(void)
     NRF_CLOCK->TASKS_HFCLKSTART = 1; 
     // Wait for clock to start
     while(NRF_CLOCK->EVENTS_HFCLKSTARTED == 0) ;
+
+    // FRONT_LEFT_A, FRONT_LEFT_B, FL_A1, FL_B1 (backwards)
+    // FRONT_LEFT_A, FRONT_LEFT_B, FL_A2, FL_B1 (1st wheel goes backward, 2nd wheel goes forward)
+    // FRONT_LEFT_A, FRONT_LEFT_B, FL_A1, FL_B2 (1st wheel goes forward, 2nd wheel goes backward)
+    // FRONT_LEFT_A, FRONT_LEFT_B, FL_A2, FL_B2 (forward)
     
-    pwm_init(&m_pwm0, OUTPUT_PIN,
-                        OUTPUT_PIN_4, 
-                        UNUSED_PIN,
-                        UNUSED_PIN);
+    pwm_init(&m_pwm0, FRONT_LEFT_A,
+                        FRONT_LEFT_B, 
+                        FL_A2,
+                        FL_B2);
 
-    pwm_init(&m_pwm1, OUTPUT_PIN_2,
-                        UNUSED_PIN, 
-                        UNUSED_PIN,
-                        UNUSED_PIN);
+    pwm_init(&m_pwm1, FRONT_RIGHT_A,
+                        FRONT_RIGHT_B, 
+                        FR_A2,
+                        FR_B2);
+    // Tried: A2, B2;
 
-    pwm_init(&m_pwm2, OUTPUT_PIN_3,
-                        UNUSED_PIN, 
-                        UNUSED_PIN,
-                        UNUSED_PIN);
+    pwm_init(&m_pwm2, REAR_RIGHT_A,
+                        REAR_LEFT_B, 
+                        RL_A1,
+                        RR_B1);
 
     for (;;)
     {
