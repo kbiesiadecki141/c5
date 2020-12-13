@@ -36,6 +36,7 @@
 #include "romiUtilities.h"
 
 #include "app_pwm.h"
+#include "c5_config.h"
 
 #include "states.h"
 
@@ -53,6 +54,7 @@ static uint8_t m_used = 0;
 // 5000, 20000 is another nice-sounding frequency
 #define FREQ_IN_US 20000
 
+/*
 #define REAR_RIGHT_A   19  // this pin is connected with enable A pin of L298N module
 #define REAR_LEFT_B    25  // this pin is connected with enable B pin of L298N module
 #define RL_A1   20  // Rear Left channel 1, driven by ENA
@@ -79,6 +81,7 @@ static uint8_t m_used = 0;
 #define OUTPUT_PIN_2 18
 #define OUTPUT_PIN_3 19
 #define OUTPUT_PIN_4 20
+*/
 
 // Declare variables holding PWM sequence values. In this example only one channel is used 
 nrf_pwm_values_individual_t seq_values[] = {0, 0, 0, 0};
@@ -162,7 +165,7 @@ int main(void)
                   
     pwm_init(&m_pwm2, REAR_RIGHT_A, REAR_LEFT_B,
                       RR_B1 | NRF_DRV_PWM_PIN_INVERTED,
-                      RL_A1 | NRF_DRV_PWM_PIN_INVERTED);
+                      RL_A2 | NRF_DRV_PWM_PIN_INVERTED);
 
                     
 
