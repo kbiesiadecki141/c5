@@ -51,7 +51,7 @@ static uint8_t m_used = 0;
 
 // define the pwm time period for pwm wave
 // 5000, 20000 is another nice-sounding frequency
-#define FREQ_IN_US 20000
+#define FREQ_IN_US 5000
 
 #define REAR_RIGHT_A   25  // this pin is connected with enable A pin of L298N module
 #define REAR_LEFT_B    19  // this pin is connected with enable B pin of L298N module
@@ -129,27 +129,27 @@ void pwm_init(nrf_drv_pwm_t * m_pwm, int one, int two, int three, int four)
 
 // will have to make separate pwm_init functions if using this format for directions
 // Using PWM0 for rear motors
-void pwm_init1(void)
-{
-    nrf_drv_pwm_config_t const config0 =
-    {
-        .output_pins =
-        {
-            OUTPUT_PIN_4 , // channel 0 // move forward by default
-            REAR_LEFT_B | NRF_DRV_PWM_PIN_INVERTED, // channel 1
-            RR_A | NRF_DRV_PWM_PIN_INVERTED, // channel 2
-            RL_B | NRF_DRV_PWM_PIN_INVERTED // channel 3
-        },
-        .irq_priority = APP_IRQ_PRIORITY_LOWEST,
-        .base_clock   = NRF_PWM_CLK_1MHz,
-        .count_mode   = NRF_PWM_MODE_UP,
-        .top_value    = 100,
-        .load_mode    = NRF_PWM_LOAD_INDIVIDUAL,
-        .step_mode    = NRF_PWM_STEP_AUTO
-    };
-    // Init PWM without error handler
-    APP_ERROR_CHECK(nrf_drv_pwm_init(&m_pwm0, &config0, NULL));
-}
+// void pwm_init1(void)
+// {
+//     nrf_drv_pwm_config_t const config0 =
+//     {
+//         .output_pins =
+//         {
+//             OUTPUT_PIN_4 , // channel 0 // move forward by default
+//             REAR_LEFT_B | NRF_DRV_PWM_PIN_INVERTED, // channel 1
+//             RR_A | NRF_DRV_PWM_PIN_INVERTED, // channel 2
+//             RL_B | NRF_DRV_PWM_PIN_INVERTED // channel 3
+//         },
+//         .irq_priority = APP_IRQ_PRIORITY_LOWEST,
+//         .base_clock   = NRF_PWM_CLK_1MHz,
+//         .count_mode   = NRF_PWM_MODE_UP,
+//         .top_value    = 100,
+//         .load_mode    = NRF_PWM_LOAD_INDIVIDUAL,
+//         .step_mode    = NRF_PWM_STEP_AUTO
+//     };
+//     // Init PWM without error handler
+//     APP_ERROR_CHECK(nrf_drv_pwm_init(&m_pwm0, &config0, NULL));
+// }
 
 /*
 static void pwm_init3(void)
@@ -185,9 +185,6 @@ void pwm_init2(void)
             NRF_DRV_PWM_PIN_NOT_USED,
             NRF_DRV_PWM_PIN_NOT_USED,
             NRF_DRV_PWM_PIN_NOT_USED
-            // INPUT_1 | NRF_DRV_PWM_PIN_INVERTED,             // channel 1
-            // ENABLE_PIN_B | NRF_DRV_PWM_PIN_INVERTED,             // channel 2
-            // INPUT_4 | NRF_DRV_PWM_PIN_INVERTED,             // channel 3
         },
         .irq_priority = APP_IRQ_PRIORITY_LOWEST,
         .base_clock   = NRF_PWM_CLK_1MHz,
@@ -228,10 +225,10 @@ int main(void)
                      RR_B2 | NRF_DRV_PWM_PIN_INVERTED);
 
                     
-    pwm_init(&m_pwm1, OUTPUT_PIN_2,
-                     NRF_DRV_PWM_PIN_NOT_USED,
-                     NRF_DRV_PWM_PIN_NOT_USED,
-                     NRF_DRV_PWM_PIN_NOT_USED);
+    // pwm_init(&m_pwm1, OUTPUT_PIN_2,
+    //                  NRF_DRV_PWM_PIN_NOT_USED,
+    //                  NRF_DRV_PWM_PIN_NOT_USED,
+    //                  NRF_DRV_PWM_PIN_NOT_USED);
     pwm_init2();
 
     // bool dir = true; // goes backwards, clockwise when false
