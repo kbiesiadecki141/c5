@@ -3599,48 +3599,30 @@
 // <e> NRFX_PWM_ENABLED - nrfx_pwm - PWM peripheral driver
 //==========================================================
 #ifndef NRFX_PWM_ENABLED
-<<<<<<< HEAD
-#define NRFX_PWM_ENABLED 0
-=======
 #define NRFX_PWM_ENABLED 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 // <q> NRFX_PWM0_ENABLED  - Enable PWM0 instance
  
 
-#ifndef NRFX_PWM0_ENABLED
-<<<<<<< HEAD
-#define NRFX_PWM0_ENABLED 0
-=======
+#ifndef NRFX_PWM0_ENABLE
 #define NRFX_PWM0_ENABLED 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 
 // <q> NRFX_PWM1_ENABLED  - Enable PWM1 instance
  
 
 #ifndef NRFX_PWM1_ENABLED
-<<<<<<< HEAD
-#define NRFX_PWM1_ENABLED 0
-=======
 #define NRFX_PWM1_ENABLED 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 
 // <q> NRFX_PWM2_ENABLED  - Enable PWM2 instance
  
 
 #ifndef NRFX_PWM2_ENABLED
-<<<<<<< HEAD
-#define NRFX_PWM2_ENABLED 0
-#endif
-
-=======
 #define NRFX_PWM2_ENABLED 1
 #endif
 
 
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 // <o> NRFX_PWM_DEFAULT_CONFIG_OUT0_PIN - Out0 pin  <0-31> 
 
 
@@ -4720,65 +4702,41 @@
 // <e> NRFX_TIMER_ENABLED - nrfx_timer - TIMER periperal driver
 //==========================================================
 #ifndef NRFX_TIMER_ENABLED
-<<<<<<< HEAD
-#define NRFX_TIMER_ENABLED 0
-=======
 #define NRFX_TIMER_ENABLED 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 // <q> NRFX_TIMER0_ENABLED  - Enable TIMER0 instance
  
 
 #ifndef NRFX_TIMER0_ENABLED
-<<<<<<< HEAD
-#define NRFX_TIMER0_ENABLED 0
-=======
 #define NRFX_TIMER0_ENABLED 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 
 // <q> NRFX_TIMER1_ENABLED  - Enable TIMER1 instance
  
 
 #ifndef NRFX_TIMER1_ENABLED
-<<<<<<< HEAD
-#define NRFX_TIMER1_ENABLED 0
-=======
 #define NRFX_TIMER1_ENABLED 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 
 // <q> NRFX_TIMER2_ENABLED  - Enable TIMER2 instance
  
 
 #ifndef NRFX_TIMER2_ENABLED
-<<<<<<< HEAD
-#define NRFX_TIMER2_ENABLED 0
-=======
 #define NRFX_TIMER2_ENABLED 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 
 // <q> NRFX_TIMER3_ENABLED  - Enable TIMER3 instance
  
 
 #ifndef NRFX_TIMER3_ENABLED
-<<<<<<< HEAD
-#define NRFX_TIMER3_ENABLED 0
-=======
 #define NRFX_TIMER3_ENABLED 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 
 // <q> NRFX_TIMER4_ENABLED  - Enable TIMER4 instance
  
 
-#ifndef NRFX_TIMER4_ENABLED
-<<<<<<< HEAD
-#define NRFX_TIMER4_ENABLED 0
-=======
+#ifndef NRFX_TIMER4_ENABLE
 #define NRFX_TIMER4_ENABLED 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 
 // <o> NRFX_TIMER_DEFAULT_CONFIG_FREQUENCY  - Timer frequency if in Timer mode
@@ -4795,11 +4753,7 @@
 // <9=> 31.25 kHz 
 
 #ifndef NRFX_TIMER_DEFAULT_CONFIG_FREQUENCY
-<<<<<<< HEAD
-#define NRFX_TIMER_DEFAULT_CONFIG_FREQUENCY 0
-=======
 #define NRFX_TIMER_DEFAULT_CONFIG_FREQUENCY 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 
 // <o> NRFX_TIMER_DEFAULT_CONFIG_MODE  - Timer mode or operation
@@ -4808,11 +4762,7 @@
 // <1=> Counter 
 
 #ifndef NRFX_TIMER_DEFAULT_CONFIG_MODE
-<<<<<<< HEAD
-#define NRFX_TIMER_DEFAULT_CONFIG_MODE 0
-=======
 #define NRFX_TIMER_DEFAULT_CONFIG_MODE 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 
 // <o> NRFX_TIMER_DEFAULT_CONFIG_BIT_WIDTH  - Timer counter bit width
@@ -4822,12 +4772,8 @@
 // <2=> 24 bit 
 // <3=> 32 bit 
 
-#ifndef NRFX_TIMER_DEFAULT_CONFIG_BIT_WIDTH
-<<<<<<< HEAD
-#define NRFX_TIMER_DEFAULT_CONFIG_BIT_WIDTH 0
-=======
+#ifndef NRFX_TIMER_DEFAULT_CONFIG_BIT_WIDT
 #define NRFX_TIMER_DEFAULT_CONFIG_BIT_WIDTH 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 
 // <o> NRFX_TIMER_DEFAULT_CONFIG_IRQ_PRIORITY  - Interrupt priority
@@ -5743,9 +5689,6 @@
 // <e> PWM_ENABLED - nrf_drv_pwm - PWM peripheral driver - legacy layer
 //==========================================================
 #ifndef PWM_ENABLED
-<<<<<<< HEAD
-#define PWM_ENABLED 0
-=======
 #define PWM_ENABLED 1
 >>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
@@ -5847,33 +5790,21 @@
  
 
 #ifndef PWM0_ENABLED
-<<<<<<< HEAD
-#define PWM0_ENABLED 0
-=======
 #define PWM0_ENABLED 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 
 // <q> PWM1_ENABLED  - Enable PWM1 instance
  
 
 #ifndef PWM1_ENABLED
-<<<<<<< HEAD
-#define PWM1_ENABLED 0
-=======
 #define PWM1_ENABLED 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 
 // <q> PWM2_ENABLED  - Enable PWM2 instance
  
 
 #ifndef PWM2_ENABLED
-<<<<<<< HEAD
-#define PWM2_ENABLED 0
-=======
 #define PWM2_ENABLED 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 
 // <e> PWM_NRF52_ANOMALY_109_WORKAROUND_ENABLED - Enables nRF52 Anomaly 109 workaround for PWM.
@@ -6984,21 +6915,13 @@
  
 
 #ifndef APP_PWM_ENABLED
-<<<<<<< HEAD
-#define APP_PWM_ENABLED 0
-=======
 #define APP_PWM_ENABLED 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 
 // <e> APP_SCHEDULER_ENABLED - app_scheduler - Events scheduler
 //==========================================================
 #ifndef APP_SCHEDULER_ENABLED
-<<<<<<< HEAD
-#define APP_SCHEDULER_ENABLED 0
-=======
 #define APP_SCHEDULER_ENABLED 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 // <q> APP_SCHEDULER_WITH_PAUSE  - Enabling pause feature
  
@@ -7064,11 +6987,7 @@
 // <e> APP_TIMER_ENABLED - app_timer - Application timer functionality
 //==========================================================
 #ifndef APP_TIMER_ENABLED
-<<<<<<< HEAD
-#define APP_TIMER_ENABLED 0
-=======
 #define APP_TIMER_ENABLED 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 // <o> APP_TIMER_CONFIG_RTC_FREQUENCY  - Configure RTC prescaler.
  
@@ -7734,11 +7653,7 @@
  
 
 #ifndef LOW_POWER_PWM_ENABLED
-<<<<<<< HEAD
-#define LOW_POWER_PWM_ENABLED 0
-=======
 #define LOW_POWER_PWM_ENABLED 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 
 // <e> MEM_MANAGER_ENABLED - mem_manager - Dynamic memory allocator
