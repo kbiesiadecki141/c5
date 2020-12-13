@@ -180,6 +180,18 @@ int main(void)
             nrf_delay_ms(10);
             pwm_update_duty_cycle(i, false);
         }
+
+
+
+
+
+
+
+
+
+
+
+        
     }
 }
 
