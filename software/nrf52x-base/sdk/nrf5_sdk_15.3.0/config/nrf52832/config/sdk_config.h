@@ -4762,11 +4762,7 @@
 // <1=> Counter 
 
 #ifndef NRFX_TIMER_DEFAULT_CONFIG_MODE
-<<<<<<< HEAD
-#define NRFX_TIMER_DEFAULT_CONFIG_MODE 0
-=======
 #define NRFX_TIMER_DEFAULT_CONFIG_MODE 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 
 // <o> NRFX_TIMER_DEFAULT_CONFIG_BIT_WIDTH  - Timer counter bit width
@@ -4776,12 +4772,8 @@
 // <2=> 24 bit 
 // <3=> 32 bit 
 
-#ifndef NRFX_TIMER_DEFAULT_CONFIG_BIT_WIDTH
-<<<<<<< HEAD
-#define NRFX_TIMER_DEFAULT_CONFIG_BIT_WIDTH 0
-=======
+#ifndef NRFX_TIMER_DEFAULT_CONFIG_BIT_WIDT
 #define NRFX_TIMER_DEFAULT_CONFIG_BIT_WIDTH 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 
 // <o> NRFX_TIMER_DEFAULT_CONFIG_IRQ_PRIORITY  - Interrupt priority
@@ -5697,9 +5689,6 @@
 // <e> PWM_ENABLED - nrf_drv_pwm - PWM peripheral driver - legacy layer
 //==========================================================
 #ifndef PWM_ENABLED
-<<<<<<< HEAD
-#define PWM_ENABLED 0
-=======
 #define PWM_ENABLED 1
 >>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
@@ -5801,33 +5790,21 @@
  
 
 #ifndef PWM0_ENABLED
-<<<<<<< HEAD
-#define PWM0_ENABLED 0
-=======
 #define PWM0_ENABLED 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 
 // <q> PWM1_ENABLED  - Enable PWM1 instance
  
 
 #ifndef PWM1_ENABLED
-<<<<<<< HEAD
-#define PWM1_ENABLED 0
-=======
 #define PWM1_ENABLED 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 
 // <q> PWM2_ENABLED  - Enable PWM2 instance
  
 
 #ifndef PWM2_ENABLED
-<<<<<<< HEAD
-#define PWM2_ENABLED 0
-=======
 #define PWM2_ENABLED 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 
 // <e> PWM_NRF52_ANOMALY_109_WORKAROUND_ENABLED - Enables nRF52 Anomaly 109 workaround for PWM.
@@ -7676,11 +7653,7 @@
  
 
 #ifndef LOW_POWER_PWM_ENABLED
-<<<<<<< HEAD
-#define LOW_POWER_PWM_ENABLED 0
-=======
 #define LOW_POWER_PWM_ENABLED 1
->>>>>>> c482a20d91c3770975f0b770eb17348fa2639fdb
 #endif
 
 // <e> MEM_MANAGER_ENABLED - mem_manager - Dynamic memory allocator
