@@ -36,6 +36,7 @@
 #include "romiUtilities.h"
 
 #include "app_pwm.h"
+#include "c5_config.h"
 
 #include "states.h"
 
@@ -53,6 +54,8 @@ static uint8_t m_used = 0;
 // 5000, 20000 is another nice-sounding frequency
 #define FREQ_IN_US 5000
 
+/*
+
 #define REAR_RIGHT_A   19  // this pin is connected with enable A pin of L298N module
 #define REAR_LEFT_B    25  // this pin is connected with enable B pin of L298N module
 #define RL_A1   20  // Rear Left channel 1, driven by ENA
@@ -60,25 +63,26 @@ static uint8_t m_used = 0;
 #define RR_B1   23  // Rear Right channel 1, driven by ENB
 #define RR_B2   24  // Rear Right channel 2
 
-#define FRONT_LEFT_A    12  // this pin is connected with enable A pin of L298N module
-#define FRONT_LEFT_B   17  // this pin is connected with enable B pin of L298N module
-#define FL_A1  13  // Front Left Bogie A channel 1, driven by ENA
-#define FL_A2  14  // Front Left Bogie A channel 2
-#define FL_B1  15  // Front Left Bogie B channel 1, driven by ENB
-#define FL_B2  16  // Front Left Bogie B channel 2
+#define FRONT_LEFT_A   13  // this pin is connected with enable A pin of L298N module
+#define FRONT_LEFT_B   18  // this pin is connected with enable B pin of L298N module
+#define FL_A1  14  // Front Left Bogie A channel 1, driven by ENA
+#define FL_A2  15  // Front Left Bogie A channel 2
+#define FL_B1  16  // Front Left Bogie B channel 1, driven by ENB
+#define FL_B2  17  // Front Left Bogie B channel 2
 
-#define FRONT_RIGHT_A    10  // this pin is connected with enable A pin of L298N module
-#define FRONT_RIGHT_B     5  // this pin is connected with enable B pin of L298N module
-#define FR_A1  9  // Front Right Bogie A channel 1
-#define FR_A2  8  // Front Right Bogie A channel 2
-#define FR_B1  7  // Front Right Bogie B channel 1
-#define FR_B2  6  // Front Right Bogie B channel 2
+#define FRONT_RIGHT_A     8  // this pin is connected with enable A pin of L298N module
+#define FRONT_RIGHT_B     31  // this pin is connected with enable B pin of L298N module
+#define FR_A1  7  // Front Right Bogie A channel 1
+#define FR_A2  6  // Front Right Bogie A channel 2
+#define FR_B1  5  // Front Right Bogie B channel 1
+#define FR_B2  21  // Front Right Bogie B channel 2
 
 // On-board LEDs test example
-#define OUTPUT_PIN 17
+#define OUTPUT_PIN_1 17
 #define OUTPUT_PIN_2 18
 #define OUTPUT_PIN_3 19
 #define OUTPUT_PIN_4 20
+*/
 
 // Declare variables holding PWM sequence values. In this example only one channel is used 
 nrf_pwm_values_individual_t seq_values[] = {0, 0, 0, 0};
@@ -98,15 +102,19 @@ void pwm_update_duty_cycle(uint8_t duty_cycle, bool direction)
     if (duty_cycle >= 100) {
             seq_values->channel_0 = 100;
             seq_values->channel_1 = 100;
+            seq_values->channel_2 = 100;
+            seq_values->channel_3 = 100;
         } else {
             seq_values->channel_0 = duty_cycle;
             seq_values->channel_1 = duty_cycle;
+            seq_values->channel_2 = duty_cycle;
+            seq_values->channel_3 = duty_cycle;
         }
     
     // potentially have different sequences for backwards/forwards
     nrf_drv_pwm_simple_playback(&m_pwm0, &seq, 3, NRF_DRV_PWM_FLAG_LOOP);
     nrf_drv_pwm_simple_playback(&m_pwm1, &seq, 3, NRF_DRV_PWM_FLAG_LOOP);
-    //nrf_drv_pwm_simple_playback(&m_pwm2, &seq, 3, NRF_DRV_PWM_FLAG_LOOP);
+    nrf_drv_pwm_simple_playback(&m_pwm2, &seq, 3, NRF_DRV_PWM_FLAG_LOOP);
 }
 
 void pwm_init(nrf_drv_pwm_t * m_pwm, int one, int two, int three, int four)
@@ -127,77 +135,6 @@ void pwm_init(nrf_drv_pwm_t * m_pwm, int one, int two, int three, int four)
     APP_ERROR_CHECK(nrf_drv_pwm_init(m_pwm, &config, NULL));
 }
 
-// will have to make separate pwm_init functions if using this format for directions
-// Using PWM0 for rear motors
-// void pwm_init1(void)
-// {
-//     nrf_drv_pwm_config_t const config0 =
-//     {
-//         .output_pins =
-//         {
-//             OUTPUT_PIN_4 , // channel 0 // move forward by default
-//             REAR_LEFT_B | NRF_DRV_PWM_PIN_INVERTED, // channel 1
-//             RR_A | NRF_DRV_PWM_PIN_INVERTED, // channel 2
-//             RL_B | NRF_DRV_PWM_PIN_INVERTED // channel 3
-//         },
-//         .irq_priority = APP_IRQ_PRIORITY_LOWEST,
-//         .base_clock   = NRF_PWM_CLK_1MHz,
-//         .count_mode   = NRF_PWM_MODE_UP,
-//         .top_value    = 100,
-//         .load_mode    = NRF_PWM_LOAD_INDIVIDUAL,
-//         .step_mode    = NRF_PWM_STEP_AUTO
-//     };
-//     // Init PWM without error handler
-//     APP_ERROR_CHECK(nrf_drv_pwm_init(&m_pwm0, &config0, NULL));
-// }
-
-/*
-static void pwm_init3(void)
-{
-    nrf_drv_pwm_config_t const config0 =
-    {
-        .output_pins =
-        {
-            OUTPUT_PIN_2, // channel 0 // move forward by default
-            NRF_DRV_PWM_PIN_NOT_USED,
-            NRF_DRV_PWM_PIN_NOT_USED,
-            NRF_DRV_PWM_PIN_NOT_USED
-        },
-        .irq_priority = APP_IRQ_PRIORITY_LOWEST,
-        .base_clock   = NRF_PWM_CLK_1MHz,
-        .count_mode   = NRF_PWM_MODE_UP,
-        .top_value    = 100,
-        .load_mode    = NRF_PWM_LOAD_INDIVIDUAL,
-        .step_mode    = NRF_PWM_STEP_AUTO
-    };
-    // Init PWM without error handler
-    APP_ERROR_CHECK(nrf_drv_pwm_init(&m_pwm2, &config0, NULL));
-}
-
-*/
-void pwm_init2(void)
-{
-    nrf_drv_pwm_config_t const config0 =
-    {
-        .output_pins =
-        {
-            OUTPUT_PIN_3, // channel 0 // move forward by default
-            NRF_DRV_PWM_PIN_NOT_USED,
-            NRF_DRV_PWM_PIN_NOT_USED,
-            NRF_DRV_PWM_PIN_NOT_USED
-        },
-        .irq_priority = APP_IRQ_PRIORITY_LOWEST,
-        .base_clock   = NRF_PWM_CLK_1MHz,
-        .count_mode   = NRF_PWM_MODE_UP,
-        .top_value    = 100,
-        .load_mode    = NRF_PWM_LOAD_INDIVIDUAL,
-        .step_mode    = NRF_PWM_STEP_AUTO
-    };
-    // Init PWM without error handler
-    printf("init2 %02x \n", &m_pwm1);
-    APP_ERROR_CHECK(nrf_drv_pwm_init(&m_pwm1, &config0, NULL));
-}
-
 int main(void)
 {
     // initialize RTT library
@@ -214,32 +151,34 @@ int main(void)
     // Wait for clock to start
     while(NRF_CLOCK->EVENTS_HFCLKSTARTED == 0) ;
     
-    //pwm_init1();
-    // pwm_init2();
-    // pwm_init3();
     // ugly style below FIXME
     // Front left config...
-    pwm_init(&m_pwm0, RL_A1 | NRF_DRV_PWM_PIN_INVERTED,
-                     RL_A2 | NRF_DRV_PWM_PIN_INVERTED,
-                     RR_B1 | NRF_DRV_PWM_PIN_INVERTED,
-                     RR_B2 | NRF_DRV_PWM_PIN_INVERTED);
+    pwm_init(&m_pwm0, FRONT_LEFT_A, FRONT_LEFT_B,
+                      FL_A2 | NRF_DRV_PWM_PIN_INVERTED,
+                      FL_B2 | NRF_DRV_PWM_PIN_INVERTED);
 
-                    
-    // pwm_init(&m_pwm1, OUTPUT_PIN_2,
-    //                  NRF_DRV_PWM_PIN_NOT_USED,
-    //                  NRF_DRV_PWM_PIN_NOT_USED,
-    //                  NRF_DRV_PWM_PIN_NOT_USED);
-    pwm_init2();
+    pwm_init(&m_pwm1, FRONT_RIGHT_A, FRONT_RIGHT_B,
+                      FR_A2 | NRF_DRV_PWM_PIN_INVERTED,
+                      FR_B2 | NRF_DRV_PWM_PIN_INVERTED);
+                  
+    pwm_init(&m_pwm2, REAR_RIGHT_A, REAR_LEFT_B,
+                      RR_B1 | NRF_DRV_PWM_PIN_INVERTED,
+                      RL_A2 | NRF_DRV_PWM_PIN_INVERTED);
 
     // bool dir = true; // goes backwards, clockwise when false
 
     for (;;)
     {
+        nrf_delay_ms(10); // why is the 10 ms delay so long LOL
+        pwm_update_duty_cycle(0, false);
+
+        /*j
         for(int i = 0; i <= 100; i++)
         {
-            nrf_delay_ms(10); // why is the 10 ms delay so long LOL
+            nrf_delay_ms(10);
             pwm_update_duty_cycle(i, false);
         }
+        */
     }
 }
 
