@@ -159,7 +159,7 @@ int main(void) {
           side_diff = c5_us_diff(&sensors);
           //printf("Cliff diff: %lf\n", front_diff);
 
-          c5_set_speeds(max_speed/2 * (1 - side_diff / side_close), max_speed/2 * (1 + side_diff / side_close));
+          c5_set_speeds(max_speed/2 * (1 + side_diff / side_close), max_speed/2 * (1 - side_diff / side_close));
           
           state = TUNNEL;
         }
