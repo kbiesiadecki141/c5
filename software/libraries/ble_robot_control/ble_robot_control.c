@@ -12,25 +12,30 @@
 
 #include "ble_robot_control.h"
 
+char * ble_str_forward = "FORWARD";
+char * ble_str_backward = "BACKWARD";
+char * ble_str_stopp = "STOP";
+char * ble_str_left = "TURN LEFT";
+char * ble_str_right = "TURN RIGHT";
 
 void ble_evt_write(ble_evt_t const* p_ble_evt) {
     if (simple_ble_is_char_event(p_ble_evt, &chatter_char)) {
       printf("CHATTER Received: %s", msg_buffer); 
       printf("\n");
 
-      if (strcmp(msg_buffer, forward) == 0) { 
+      if (strcmp(msg_buffer, ble_str_forward) == 0) { 
           printf("Moving forward...\n"); 
 
-      } else if (strcmp(msg_buffer, backward) == 0) { 
+      } else if (strcmp(msg_buffer, ble_str_backward) == 0) { 
           printf("Moving backward...\n"); 
 
-      } else if (strcmp(msg_buffer, left) == 0) { 
+      } else if (strcmp(msg_buffer, ble_str_left) == 0) { 
           printf("Moving left...\n"); 
 
-      } else if (strcmp(msg_buffer, right) == 0) { 
+      } else if (strcmp(msg_buffer, ble_str_right) == 0) { 
           printf("Moving right...\n"); 
 
-      } else if (strcmp(msg_buffer, stopp) == 0) { 
+      } else if (strcmp(msg_buffer, ble_str_stopp) == 0) { 
           printf("Stopping...\n"); 
 
       } else {

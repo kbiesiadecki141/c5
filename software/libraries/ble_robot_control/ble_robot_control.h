@@ -42,11 +42,6 @@ static char msg_buffer[12];
 
 // Main application state
 simple_ble_app_t* simple_ble_app;
-char * forward = "FORWARD";
-char * backward = "BACKWARD";
-char * stopp = "STOP";
-char * left = "TURN LEFT";
-char * right = "TURN RIGHT";
 
 void ble_evt_write(ble_evt_t const* p_ble_evt);
 
