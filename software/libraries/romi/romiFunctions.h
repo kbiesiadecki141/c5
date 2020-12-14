@@ -17,7 +17,7 @@ void read_sensors(RomiSensors_t * sensors);
 // FUNCTIONS
 bool inside_tunnel(RomiSensors_t * sensors, float side_close);
 
-bool obstacle_detected(RomiSensors_t * sensors, bool * turn_right, float front_close);
+bool obstacle_detected(RomiSensors_t * sensors, bool * turn_right, float front_close, bool prev);
 
 bool obstacle_avoided(RomiSensors_t * sensors, float front_close);
 

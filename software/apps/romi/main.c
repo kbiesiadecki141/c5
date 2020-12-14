@@ -47,7 +47,7 @@ int main(void) {
   // configure initial state
   robot_state_t state = OFF;
   bool button_pressed;
-  bool obs_detected;
+  bool obs_detected = false;
   bool obs_avoided;
   bool in_tunnel;
 
@@ -64,7 +64,7 @@ int main(void) {
     // read sensors from robot
     read_sensors(&sensors);
     button_pressed = is_button_pressed(&sensors);
-    obs_detected = obstacle_detected(&sensors, &turn_right, front_close);
+    obs_detected = obstacle_detected(&sensors, &turn_right, front_close, obs_detected);
     obs_avoided = !(obs_detected) && obstacle_avoided(&sensors, front_close);
     // nrf_delay_ms(1000);
     in_tunnel = inside_tunnel(&sensors, side_close);
