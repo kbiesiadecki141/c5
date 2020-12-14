@@ -54,7 +54,7 @@ int main(void) {
   bool turn_right;
   float side_diff;
   int back_up_time = 20;
-  int turning_time = 20;
+  int turning_time = 10;
   int back_up_counter;
   int turning_counter;
   RomiSensors_t sensors = {0};
