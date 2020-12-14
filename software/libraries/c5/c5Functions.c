@@ -1,4 +1,5 @@
 #include "c5Functions.h"
+#include "ble_robot_control.h"
 
 // INPUTS
 static bool c5_read_button(){
@@ -49,9 +50,41 @@ float c5_us_diff(C5Sensors_t * sensors){
 
 // OUTPUTS
 void c5_set_speeds(int left, int right){
-	// TODO
+	
 }
 
 void c5_stop(){
 	c5_set_speeds(0, 0);
 }
+
+// BLUETOOTH HANDLERS
+char * ble_str_forward = "FORWARD";
+char * ble_str_backward = "BACKWARD";
+char * ble_str_stop = "STOP";
+char * ble_str_left = "TURN LEFT";
+char * ble_str_right = "TURN RIGHT";
+
+void move(char * msg_buffer) {
+   printf("CHATTER Received: %s", msg_buffer); 
+   printf("\n");
+
+   if (strcmp(msg_buffer, ble_str_forward) == 0) { 
+       printf("Moving forward...\n"); 
+
+   } else if (strcmp(msg_buffer, ble_str_backward) == 0) { 
+       printf("Moving backward...\n"); 
+
+   } else if (strcmp(msg_buffer, ble_str_left) == 0) { 
+       printf("Moving left...\n"); 
+
+   } else if (strcmp(msg_buffer, ble_str_right) == 0) { 
+       printf("Moving right...\n"); 
+
+   } else if (strcmp(msg_buffer, ble_str_stop) == 0) { 
+       printf("Stopping...\n"); 
+
+   } else {
+       printf("Action not defined. \n"); 
+   }   
+}
+

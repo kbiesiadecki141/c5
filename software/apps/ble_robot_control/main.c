@@ -13,29 +13,29 @@
 #include "ble_robot_control.h"
 
 
-char * ble_str_forward = "FORWARD";
-char * ble_str_backward = "BACKWARD";
-char * ble_str_stop = "STOP";
-char * ble_str_left = "TURN LEFT";
-char * ble_str_right = "TURN RIGHT";
+char * le_str_forward = "FORWARD";
+char * le_str_backward = "BACKWARD";
+char * le_str_stop = "STOP";
+char * le_str_left = "TURN LEFT";
+char * le_str_right = "TURN RIGHT";
 
-void move(char * msg_buffer) {
+void drive(char * msg_buffer) {
    printf("CHATTER Received: %s", msg_buffer); 
    printf("\n");
 
-   if (strcmp(msg_buffer, ble_str_forward) == 0) { 
+   if (strcmp(msg_buffer, le_str_forward) == 0) { 
        printf("Moving forward...\n"); 
 
-   } else if (strcmp(msg_buffer, ble_str_backward) == 0) { 
+   } else if (strcmp(msg_buffer, le_str_backward) == 0) { 
        printf("Moving backward...\n"); 
 
-   } else if (strcmp(msg_buffer, ble_str_left) == 0) { 
+   } else if (strcmp(msg_buffer, le_str_left) == 0) { 
        printf("Moving left...\n"); 
 
-   } else if (strcmp(msg_buffer, ble_str_right) == 0) { 
+   } else if (strcmp(msg_buffer, le_str_right) == 0) { 
        printf("Moving right...\n"); 
 
-   } else if (strcmp(msg_buffer, ble_str_stop) == 0) { 
+   } else if (strcmp(msg_buffer, le_str_stop) == 0) { 
        printf("Stopping...\n"); 
 
    } else {
@@ -45,7 +45,7 @@ void move(char * msg_buffer) {
 
 
 int main(void) {
-  init_ble_rc(move);
+  init_ble_rc(drive);
 
   while(1) {
     power_manage();

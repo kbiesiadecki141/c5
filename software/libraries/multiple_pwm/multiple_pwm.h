@@ -29,21 +29,18 @@
 #include "nrf_drv_clock.h"
 #include "app_util_platform.h"
 
-#include "buckler.h"
 #include "romiActuator.h"
 #include "romiSensorPoll.h"
 #include "romiSensorTypes.h"
 #include "romiUtilities.h"
 
 #include "app_pwm.h"
-#include "c5_config.h"
 
-#include "states.h"
 
 // We want to use the PWM drivers, not the PWM library and APP_PWM_INSTANCE.
-nrf_drv_pwm_t m_pwm0 = NRF_DRV_PWM_INSTANCE(0);
-nrf_drv_pwm_t m_pwm1 = NRF_DRV_PWM_INSTANCE(1);
-nrf_drv_pwm_t m_pwm2 = NRF_DRV_PWM_INSTANCE(2);
+static nrf_drv_pwm_t m_pwm0 = NRF_DRV_PWM_INSTANCE(0);
+static nrf_drv_pwm_t m_pwm1 = NRF_DRV_PWM_INSTANCE(1);
+static nrf_drv_pwm_t m_pwm2 = NRF_DRV_PWM_INSTANCE(2);
 
 // This is for tracking PWM instances being used, so we can unintialize only
 // the relevant ones when switching from one demo to another.
@@ -56,9 +53,9 @@ static uint8_t m_used = 0;
 
 
 // Declare variables holding PWM sequence values. In this example only one channel is used 
-nrf_pwm_values_individual_t seq_values[] = {0, 0, 0, 0};
+static nrf_pwm_values_individual_t seq_values[] = {0, 0, 0, 0};
 
-nrf_pwm_sequence_t const seq =
+static nrf_pwm_sequence_t const seq =
 {
     .values.p_individual = seq_values,
     .length          = NRF_PWM_VALUES_LENGTH(seq_values),
@@ -67,45 +64,11 @@ nrf_pwm_sequence_t const seq =
 };
 
 // Set duty cycle between 0 and 100%
-void pwm_update_duty_cycle(uint8_t duty_cycle, bool direction)
-{
-    // Move forward by default with REAR_RIGHT_A and REAR_LEFT_B
-    if (duty_cycle >= 100) {
-            seq_values->channel_0 = 100;
-            seq_values->channel_1 = 100;
-            seq_values->channel_2 = 100;
-            seq_values->channel_3 = 100;
-        } else {
-            seq_values->channel_0 = duty_cycle;
-            seq_values->channel_1 = duty_cycle;
-            seq_values->channel_2 = duty_cycle;
-            seq_values->channel_3 = duty_cycle;
-        }
-    
-    // potentially have different sequences for backwards/forwards
-    nrf_drv_pwm_simple_playback(&m_pwm0, &seq, 3, NRF_DRV_PWM_FLAG_LOOP);
-    nrf_drv_pwm_simple_playback(&m_pwm1, &seq, 3, NRF_DRV_PWM_FLAG_LOOP);
-    nrf_drv_pwm_simple_playback(&m_pwm2, &seq, 3, NRF_DRV_PWM_FLAG_LOOP);
-}
+void pwm_update_duty_cycle(uint8_t duty_cycle, bool direction);
 
-void pwm_init(nrf_drv_pwm_t * m_pwm, int one, int two, int three, int four)
-{
-    nrf_drv_pwm_config_t const config =
-    {
-        .output_pins = { one, two, three, four }, // channel 1-4
-        .irq_priority = APP_IRQ_PRIORITY_LOWEST,
-        .base_clock   = NRF_PWM_CLK_1MHz,
-        .count_mode   = NRF_PWM_MODE_UP,
-        .top_value    = 100,
-        .load_mode    = NRF_PWM_LOAD_INDIVIDUAL,
-        .step_mode    = NRF_PWM_STEP_AUTO
-    };
-      
-    // Init PWM without error handler
-    printf("init %02x \n", m_pwm);
-    APP_ERROR_CHECK(nrf_drv_pwm_init(m_pwm, &config, NULL));
-}
+void pwm_init(nrf_drv_pwm_t * m_pwm, int one, int two, int three, int four);
 
+/*
 int main(void)
 {
     // initialize RTT library
@@ -148,13 +111,12 @@ int main(void)
         nrf_delay_ms(10); // why is the 10 ms delay so long LOL
         pwm_update_duty_cycle(0, false);
 
-        /*j
         for(int i = 0; i <= 100; i++)
         {
             nrf_delay_ms(10); // why is the 10 ms delay so long LOL
             pwm_update_duty_cycle(i, false);
         }
-        */
     }
 }
+*/
 

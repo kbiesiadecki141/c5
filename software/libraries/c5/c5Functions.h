@@ -1,5 +1,7 @@
 #include "c5SensorTypes.h"
+#include "c5_config.h"
 #include "hcsr04_ultrasonic.h"
+#include "nrf_drv_pwm.h"
 
 #define TRIG_F 3
 #define ECHO_F 4
@@ -38,3 +40,5 @@ float c5_us_diff(C5Sensors_t * sensors);
 void c5_set_speeds(int left, int right);
 
 void c5_stop();
+
+void move(char * msg_buffer);

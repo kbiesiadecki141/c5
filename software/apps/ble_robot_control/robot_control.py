@@ -61,7 +61,6 @@ class RobotController():
             self.pressed[event.name] = False
             self.chatter_char.write(bytes("STOP\0", 'utf-8'))
 
-            # TODO write to characteristic to stop moving in this direction
 
     def __enter__(self):
         return self
