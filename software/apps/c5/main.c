@@ -47,25 +47,25 @@ nrf_pwm_sequence_t const seq =
     .end_delay       = 0
 };
 // Set duty cycle between 0 and 100%
-void pwm_update_duty_cycle(uint8_t duty_cycle, bool direction)
+void pwm_update_duty_cycle(uint8_t duty_cycle)
 {
     // Move forward by default with REAR_RIGHT_A and REAR_LEFT_B
     if (duty_cycle >= 100) {
-            seq_values->channel_0 = 100;
-            seq_values->channel_1 = 100;
-            seq_values->channel_2 = 100;
-            seq_values->channel_3 = 100;
-        } else {
+          seq_values->channel_0 = 100;
+          seq_values->channel_1 = 100;
+          seq_values->channel_2 = 100;
+          seq_values->channel_3 = 100;
+    } else {
             seq_values->channel_0 = duty_cycle;
             seq_values->channel_1 = duty_cycle;
             seq_values->channel_2 = duty_cycle;
             seq_values->channel_3 = duty_cycle;
-        }
+    }
 
     // potentially have different sequences for backwards/forwards
-    nrf_drv_pwm_simple_playback(&m_pwm0, &seq, 3, NRF_DRV_PWM_FLAG_LOOP);
-    nrf_drv_pwm_simple_playback(&m_pwm1, &seq, 3, NRF_DRV_PWM_FLAG_LOOP);
-    nrf_drv_pwm_simple_playback(&m_pwm2, &seq, 3, NRF_DRV_PWM_FLAG_LOOP);
+    nrf_drv_pwm_simple_playback(&m_pwm0, &seq, 1, NRF_DRV_PWM_FLAG_LOOP);
+    nrf_drv_pwm_simple_playback(&m_pwm1, &seq, 1, NRF_DRV_PWM_FLAG_LOOP);
+    nrf_drv_pwm_simple_playback(&m_pwm2, &seq, 1, NRF_DRV_PWM_FLAG_LOOP);
 }
 void pwm_init(nrf_drv_pwm_t * m_pwm, int one, int two, int three, int four)
 {
@@ -85,9 +85,116 @@ void pwm_init(nrf_drv_pwm_t * m_pwm, int one, int two, int three, int four)
     APP_ERROR_CHECK(nrf_drv_pwm_init(m_pwm, &config, NULL));
 }
 
+void drive_forward()
+{
+  pwm_init(&m_pwm0, FRONT_LEFT_A, FRONT_LEFT_B,
+                      FL_A2 | NRF_DRV_PWM_PIN_INVERTED,
+                      FL_B2 | NRF_DRV_PWM_PIN_INVERTED);
 
-// I2C manager
-// NRF_TWI_MNGR_DEF(twi_mngr_instance, 5, 0);
+    pwm_init(&m_pwm1, FRONT_RIGHT_A, FRONT_RIGHT_B,
+                      FR_A2 | NRF_DRV_PWM_PIN_INVERTED,
+                      FR_B2 | NRF_DRV_PWM_PIN_INVERTED);
+
+    pwm_init(&m_pwm2, REAR_RIGHT_A, REAR_LEFT_B,
+                      RR_B1 | NRF_DRV_PWM_PIN_INVERTED,
+                      RL_A2 | NRF_DRV_PWM_PIN_INVERTED);
+}
+
+// not A1B1, A2B2
+
+void drive_backward()
+{
+  pwm_init(&m_pwm0, FRONT_LEFT_A, FRONT_LEFT_B,
+                      FL_A1 | NRF_DRV_PWM_PIN_INVERTED,
+                      FL_B1 | NRF_DRV_PWM_PIN_INVERTED);
+
+  pwm_init(&m_pwm1, FRONT_RIGHT_A, FRONT_RIGHT_B,
+                      FR_A2 | NRF_DRV_PWM_PIN_INVERTED,
+                      FR_B2 | NRF_DRV_PWM_PIN_INVERTED);
+
+  pwm_init(&m_pwm2, REAR_RIGHT_A, REAR_LEFT_B,
+                      RR_B2 | NRF_DRV_PWM_PIN_INVERTED,
+                      RL_A1 | NRF_DRV_PWM_PIN_INVERTED);
+}
+
+void turn_left()
+{
+  pwm_init(&m_pwm0, FRONT_LEFT_A, FRONT_LEFT_B,
+                      FL_A1 | NRF_DRV_PWM_PIN_INVERTED,
+                      FL_B1 | NRF_DRV_PWM_PIN_INVERTED);
+
+  pwm_init(&m_pwm1, FRONT_RIGHT_A, FRONT_RIGHT_B,
+                      FR_A2 | NRF_DRV_PWM_PIN_INVERTED,
+                      FR_B2 | NRF_DRV_PWM_PIN_INVERTED);
+
+  pwm_init(&m_pwm2, REAR_RIGHT_A, REAR_LEFT_B,
+                      RR_B1 | NRF_DRV_PWM_PIN_INVERTED,
+                      RL_A1 | NRF_DRV_PWM_PIN_INVERTED);
+}
+
+void turn_right()
+{
+  pwm_init(&m_pwm0, FRONT_LEFT_A, FRONT_LEFT_B,
+                      FL_A2 | NRF_DRV_PWM_PIN_INVERTED,
+                      FL_B2 | NRF_DRV_PWM_PIN_INVERTED);
+
+  pwm_init(&m_pwm1, FR_A2, FR_B1, FRONT_RIGHT_A, FRONT_RIGHT_B);
+
+  pwm_init(&m_pwm2, REAR_RIGHT_A, REAR_LEFT_B,
+                      RR_B2 | NRF_DRV_PWM_PIN_INVERTED,
+                      RL_A2 | NRF_DRV_PWM_PIN_INVERTED);
+}
+
+// BLUETOOTH HANDLERS
+char * ble_str_forward = "FORWARD";
+char * ble_str_backward = "BACKWARD";
+char * ble_str_stop = "STOP";
+char * ble_str_left = "TURN LEFT";
+char * ble_str_right = "TURN RIGHT";
+
+void move(char * msg_buffer) {
+   printf("CHATTER Received: %s", msg_buffer); 
+   printf("\n");
+
+   if (strcmp(msg_buffer, ble_str_forward) == 0) { 
+       printf("Moving forward...\n"); 
+
+      drive_forward();
+
+      pwm_update_duty_cycle(0);
+
+      for (int i = 0; i < 50; i++) {
+        if (i == 50) {
+          pwm_update_duty_cycle(100);
+        }
+      }
+
+      pwm_update_duty_cycle(0);
+   } else if (strcmp(msg_buffer, ble_str_backward) == 0) { 
+       printf("Moving backward...\n"); 
+
+       drive_backward(); // not working on right bogie :()
+       pwm_update_duty_cycle(0);
+
+   } else if (strcmp(msg_buffer, ble_str_left) == 0) { 
+       printf("Moving left...\n"); 
+
+       turn_left();
+       pwm_update_duty_cycle(0);
+
+   } else if (strcmp(msg_buffer, ble_str_right) == 0) { 
+       printf("Moving right...\n"); 
+
+       turn_right();
+       pwm_update_duty_cycle(0);
+
+   } else if (strcmp(msg_buffer, ble_str_stop) == 0) { 
+       printf("Stopping...\n"); 
+
+   } else {
+       printf("Action not defined. \n"); 
+   }   
+}
 
 int main(void) {
   printf("Initializing\n");
@@ -102,19 +209,9 @@ int main(void) {
   // Start clock for accurate frequencies
   NRF_CLOCK->TASKS_HFCLKSTART = 1;
   // Wait for clock to start
-  while(NRF_CLOCK->EVENTS_HFCLKSTARTED == 0) ;
+  while(NRF_CLOCK->EVENTS_HFCLKSTARTED == 0);
 
-      pwm_init(&m_pwm0, FRONT_LEFT_A, FRONT_LEFT_B,
-                      FL_A2 | NRF_DRV_PWM_PIN_INVERTED,
-                      FL_B2 | NRF_DRV_PWM_PIN_INVERTED);
-
-    pwm_init(&m_pwm1, FRONT_RIGHT_A, FRONT_RIGHT_B,
-                      FR_A2 | NRF_DRV_PWM_PIN_INVERTED,
-                      FR_B2 | NRF_DRV_PWM_PIN_INVERTED);
-
-    pwm_init(&m_pwm2, REAR_RIGHT_A, REAR_LEFT_B,
-                      RR_B1 | NRF_DRV_PWM_PIN_INVERTED,
-                      RL_A2 | NRF_DRV_PWM_PIN_INVERTED);
+  // drive_forward();
 
   float front_close = 0.2;
   float side_close = 1;//0.2;
@@ -151,8 +248,9 @@ int main(void) {
     // delay before continuing
     // Note: removing this delay will make responses quicker, but will result
     //  in printf's in this loop breaking JTAG
-    nrf_delay_ms(1);
-    pwm_update_duty_cycle(0, false);
+    // nrf_delay_ms(1);
+    // pwm_update_duty_cycle(0);
+
 
     // handle states
     switch(state) {
