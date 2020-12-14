@@ -199,6 +199,24 @@ void turn_right()
   pwm_update_duty_cycle(0); // Speed control.
 }
 
+void stop_driving() 
+{
+  // Left side.
+  gpio_set(FL_A1);
+  gpio_set(FL_A2);
+  gpio_set(FR_A1);
+  gpio_set(FR_A2);
+  gpio_set(FL_B1);
+  gpio_set(FL_B2);
+  gpio_set(FR_B1);
+  gpio_set(FR_B2);
+  gpio_set(RL_A1);
+  gpio_set(RL_A2);
+  gpio_set(RR_B1);
+  gpio_set(RR_B2);
+
+}
+
 // BLUETOOTH HANDLERS
 char * ble_str_forward = "FORWARD";
 char * ble_str_backward = "BACKWARD";
@@ -224,6 +242,7 @@ void move(char * msg_buffer) {
        turn_right();
    } else if (strcmp(msg_buffer, ble_str_stop) == 0) { 
        printf("Stopping...\n"); 
+       stop_driving();
        //pwm_update_duty_cycle(100);
 
    } else {
