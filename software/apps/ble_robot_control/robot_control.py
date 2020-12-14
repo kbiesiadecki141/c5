@@ -13,42 +13,30 @@ addr = args.addr.lower()
 if len(addr) != 17:
     raise ValueError("Invalid address supplied")
 
-# LED_SERVICE_UUID = "32e61089-2b22-4db5-a914-43ce41986c70"
-# LED_CHAR_UUIDS   = "32e68911-2b22-4db5-a914-43ce41986c70"
-
 CHATTER_SERVICE_UUID = "32e60000-2b22-4db5-a914-43ce41986c70"
 CHATTER_CHAR_UUID    = "32e60001-2b22-4db5-a914-43ce41986c70"
-'''
-{0x70,0x6C,0x98,0x41,0xCE,0x43,0x14,0xA9,
-                0xB5,0x4D,0x22,0x2B,0x89,0x10,0xE6,0x32}
-'''
 
 class RobotController():
 
     def __init__(self, address):
 
-        print("connecting...")
+        print("Connecting...")
         self.robot = Peripheral(addr)
-        print("connected")
+        print("Connected.")
 
         # keep state for keypresses
-        self.pressed = {"up": False, "down": False, "right": False, "left": False}
-
-        # Get service
-        #sv = self.robot.getServiceByUUID(LED_SERVICE_UUID)
-        # Get characteristic
-        #self.ch = sv.getCharacteristics(LED_CHAR_UUIDS)[0]
+        self.pressed = {"up": False, "down": False, "right": False, "left": False, 
+                        "t": False, "s": False}
 
         # Get service
         sv = self.robot.getServiceByUUID(CHATTER_SERVICE_UUID)
         # Get characteristic
         self.chatter_char = sv.getCharacteristics(CHATTER_CHAR_UUID)[0]
 
+        # Listen to keyboard.
         keyboard.hook(self.on_key_event)
 
     def on_key_event(self, event):
-        # print key name
-        print(event.name)
         # if a key unrelated to direction keys is pressed, ignore
         if event.name not in self.pressed: return
         # if a key is pressed down
@@ -57,19 +45,21 @@ class RobotController():
             if self.pressed[event.name]: return
             # set state of key to pressed
             self.pressed[event.name] = True
+            print(event.name)
 
-            # TODO write to characteristic to change direction
             if event.name == "up":
-              print("potato") 
- 
-            #led_state = bool(int(self.ch.read().hex()))
-            #self.ch.write(bytes([not led_state]))
-
-            self.chatter_char.write(bytes("Greetings", 'utf-8'))
+              self.chatter_char.write(bytes("FORWARD\0", 'utf-8'))
+            elif event.name == "down":
+              self.chatter_char.write(bytes("BACKWARD\0", 'utf-8'))
+            elif event.name == "left":
+              self.chatter_char.write(bytes("TURN LEFT\0", 'utf-8'))
+            elif event.name == "right":
+              self.chatter_char.write(bytes("TURN RIGHT\0", 'utf-8'))
 
         else:
             # set state of key to released
             self.pressed[event.name] = False
+            self.chatter_char.write(bytes("STOP\0", 'utf-8'))
 
             # TODO write to characteristic to stop moving in this direction
 
