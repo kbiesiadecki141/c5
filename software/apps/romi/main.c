@@ -39,7 +39,7 @@ int main(void) {
   // initialize_robot();
   printf("Romi initialized!\n");
 
-  float front_close = 0.2;
+  float front_close = 0.01;
   float side_close = 1;//0.2;
   float max_speed = 100;
   float turning_speed = max_speed/2;
@@ -64,7 +64,7 @@ int main(void) {
     // read sensors from robot
     read_sensors(&sensors);
     button_pressed = is_button_pressed(&sensors);
-    obs_detected = obstacle_detected(&sensors, &turn_right);
+    obs_detected = obstacle_detected(&sensors, &turn_right, front_close);
     obs_avoided = !(obs_detected) && obstacle_avoided(&sensors, front_close);
     // nrf_delay_ms(1000);
     in_tunnel = inside_tunnel(&sensors, side_close);
