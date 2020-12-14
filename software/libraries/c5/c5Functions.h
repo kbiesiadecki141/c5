@@ -1,7 +1,6 @@
 #include "c5SensorTypes.h"
 #include "c5_config.h"
 #include "hcsr04_ultrasonic.h"
-#include "nrf_drv_pwm.h"
 
 #define TRIG_F 3
 #define ECHO_F 4

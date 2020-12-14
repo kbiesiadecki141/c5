@@ -52,6 +52,7 @@ int main(void) {
   int back_up_counter;
   int turning_counter;
   C5Sensors_t sensors = {0};
+
   init_ble_rc(move);
 
   // loop forever, running state machine

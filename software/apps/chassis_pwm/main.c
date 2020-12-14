@@ -38,7 +38,6 @@
 #include "app_pwm.h"
 #include "c5_config.h"
 
-#include "states.h"
 
 // We want to use the PWM drivers, not the PWM library and APP_PWM_INSTANCE.
 nrf_drv_pwm_t m_pwm0 = NRF_DRV_PWM_INSTANCE(0);
@@ -48,7 +47,7 @@ nrf_drv_pwm_t m_pwm2 = NRF_DRV_PWM_INSTANCE(2);
 // This is for tracking PWM instances being used, so we can unintialize only
 // the relevant ones when switching from one demo to another.
 #define USED_PWM(idx) (1UL << idx)
-static uint8_t m_used = 0;
+uint8_t m_used = 0;
 
 // define the pwm time period for pwm wave
 // 5000, 20000 is another nice-sounding frequency
