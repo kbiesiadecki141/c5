@@ -18,8 +18,11 @@
 #include "simple_ble.h"
 #include "nrf_gpio.h"
 
+// Callback function for ble_write_t.
+typedef void (*callback_t)(char * msg);
+callback_t cb;
 
-// Intervals for advertising and connections
+// Intervals for advertising and connections.
 static simple_ble_config_t ble_config = {
         // c0:98:e5:49:00:00
         .platform_id       = 0x49,    // used as 4th octect in device BLE address
@@ -45,11 +48,11 @@ simple_ble_app_t* simple_ble_app;
 
 void ble_evt_write(ble_evt_t const* p_ble_evt);
 
-void ble_evt_adv_report(ble_evt_t const* p_ble_evt) ;
+void ble_evt_adv_report(ble_evt_t const* p_ble_evt);
 
-void ble_evt_connected(ble_evt_t const* p_ble_evt) ;
+void ble_evt_connected(ble_evt_t const* p_ble_evt);
 
 void ble_evt_disconnected(ble_evt_t const* p_ble_evt);
 
-void init_ble_rc() ;
+void init_ble_rc();
 

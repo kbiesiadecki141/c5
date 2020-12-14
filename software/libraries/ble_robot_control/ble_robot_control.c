@@ -12,35 +12,10 @@
 
 #include "ble_robot_control.h"
 
-char * ble_str_forward = "FORWARD";
-char * ble_str_backward = "BACKWARD";
-char * ble_str_stopp = "STOP";
-char * ble_str_left = "TURN LEFT";
-char * ble_str_right = "TURN RIGHT";
 
 void ble_evt_write(ble_evt_t const* p_ble_evt) {
     if (simple_ble_is_char_event(p_ble_evt, &chatter_char)) {
-      printf("CHATTER Received: %s", msg_buffer); 
-      printf("\n");
-
-      if (strcmp(msg_buffer, ble_str_forward) == 0) { 
-          printf("Moving forward...\n"); 
-
-      } else if (strcmp(msg_buffer, ble_str_backward) == 0) { 
-          printf("Moving backward...\n"); 
-
-      } else if (strcmp(msg_buffer, ble_str_left) == 0) { 
-          printf("Moving left...\n"); 
-
-      } else if (strcmp(msg_buffer, ble_str_right) == 0) { 
-          printf("Moving right...\n"); 
-
-      } else if (strcmp(msg_buffer, ble_str_stopp) == 0) { 
-          printf("Stopping...\n"); 
-
-      } else {
-          printf("Action not defined. \n"); 
-      }
+      cb(msg_buffer);
     }
 }
 
@@ -58,7 +33,7 @@ void ble_evt_disconnected(ble_evt_t const* p_ble_evt) {
 }
 
 
-void init_ble_rc() {
+void init_ble_rc(callback_t f) {
   printf("Bluetooth Robot Control \n");
 
   // Setup BLE
@@ -74,10 +49,7 @@ void init_ble_rc() {
   // Start Advertising
   simple_ble_adv_only_name();
 
-  /*
-  while(1) {
-    power_manage();
-  }
-  */
+  // Set callback. 
+  cb = f;
 }
 
