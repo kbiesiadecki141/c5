@@ -13,11 +13,11 @@
 #define FL_B2  17  // Front Left Bogie B channel 2
 
 #define FRONT_RIGHT_A     8  // this pin is connected with enable A pin of L298N module
-#define FRONT_RIGHT_B     31  // this pin is connected with enable B pin of L298N module
-#define FR_A1  1  // Front Right Bogie A channel 1
+#define FRONT_RIGHT_B     1  // this pin is connected with enable B pin of L298N module
+#define FR_A1  31  // Front Right Bogie A channel 1
 #define FR_A2  5  // Front Right Bogie A channel 2
 #define FR_B1  6  // Front Right Bogie B channel 1
-#define FR_B2  7  // Front Right Bogie B channel 2
+#define FR_B2  29  // Front Right Bogie B channel 2
 
 // On-board LEDs test example for debugging
 #define OUTPUT_PIN_1 17
