@@ -54,7 +54,7 @@ int main(void) {
   bool turn_right;
   float side_diff;
   int back_up_time = 20;
-  int turning_time = 20;
+  int turning_time = 10;
   int back_up_counter;
   int turning_counter;
   RomiSensors_t sensors = {0};
@@ -98,6 +98,7 @@ int main(void) {
           state = AVOID;
           printf("AVOID\n");
           back_up_counter = 0;
+          turning_counter = 0;
         } else if (in_tunnel) {
           state = TUNNEL;
           printf("TUNNEL\n");
@@ -156,6 +157,7 @@ int main(void) {
           state = AVOID;
           printf("AVOID\n");
           back_up_counter = 0;
+          turning_counter = 0;
         } else if (! in_tunnel) {
           state = TELEOP;
           printf("TELEOP\n");
