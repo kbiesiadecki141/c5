@@ -57,6 +57,7 @@ int main(void) {
   float left_us;
   float right_us;
   float side_diff;
+  float side_sum;
   int back_up_time = 20;
   int turning_time = 10;
   int back_up_counter;
@@ -156,22 +157,23 @@ int main(void) {
         // transition logic
         if (button_pressed) {
           state = OFF;
-        } else if (obs_detected) {
-          set_speeds(-max_speed, -max_speed);
-          state = AVOID;
-          printf("AVOID\n");
-          back_up_counter = 0;
-        } else if (! in_tunnel) {
-          state = TELEOP;
-          printf("TELEOP\n");
+        // } else if (obs_detected) {
+        //   set_speeds(-max_speed, -max_speed);
+        //   state = AVOID;
+        //   printf("AVOID\n");
+        //   back_up_counter = 0;
+        // } else if (! in_tunnel) {
+        //   state = TELEOP;
+        //   printf("TELEOP\n");
         } else {
           // perform state-specific actions here
 
-          side_diff = us_diff(&left_us, &right_us);
-          int left_speed = (int)(max_speed/4. + (max_speed/8.) * (side_diff / max_diff));
-          int right_speed = (int)(max_speed/4. - (max_speed/8.) * (side_diff / max_diff));
-          printf("left_speed: %d\n", left_speed);
-          printf("right_speed: %d\n", right_speed);
+          side_diff = right_us - left_us;
+          side_sum = right_us + left_us;//us_diff(&left_us, &right_us);
+          int left_speed = (int)(max_speed/3. + (max_speed/3.) * (side_diff / side_sum));
+          int right_speed = (int)(max_speed/3. - (max_speed/3.) * (side_diff / side_sum));
+          printf("speed diff: %d\n", right_speed - left_speed);
+          printf("side diff: %f\n", side_diff);
 
           set_speeds(left_speed, right_speed);
           
