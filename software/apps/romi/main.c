@@ -40,7 +40,7 @@ int main(void) {
   printf("Romi initialized!\n");
 
   float front_close = 0.2;
-  float side_close = 0.4;
+  float side_close = 0.3;
   float max_diff = side_close;
   float max_speed = 100;
   float turning_speed = max_speed/2;
@@ -59,7 +59,7 @@ int main(void) {
   float side_diff;
   float side_sum;
   int back_up_time = 20;
-  int turning_time = 10;
+  int turning_time = 20;
   int back_up_counter;
   int turning_counter;
   RomiSensors_t sensors = {0};
@@ -157,21 +157,21 @@ int main(void) {
         // transition logic
         if (button_pressed) {
           state = OFF;
-        // } else if (obs_detected) {
-        //   set_speeds(-max_speed, -max_speed);
-        //   state = AVOID;
-        //   printf("AVOID\n");
-        //   back_up_counter = 0;
-        // } else if (! in_tunnel) {
-        //   state = TELEOP;
-        //   printf("TELEOP\n");
+        } else if (obs_detected) {
+          set_speeds(-max_speed, -max_speed);
+          state = AVOID;
+          printf("AVOID\n");
+          back_up_counter = 0;
+        } else if (! in_tunnel) {
+          state = TELEOP;
+          printf("TELEOP\n");
         } else {
           // perform state-specific actions here
 
           side_diff = right_us - left_us;
           side_sum = right_us + left_us;//us_diff(&left_us, &right_us);
-          int left_speed = 25 + (int) (max_speed * right_us/side_sum);//(int)(max_speed/3. - (max_speed/3.) * (side_diff / side_sum));
-          int right_speed = 25 + (int) (max_speed * left_us/side_sum); //(int)(max_speed/3. + (max_speed/3.) * (side_diff / side_sum));
+          int left_speed = (int)(max_speed/3. - (max_speed/3.) * (side_diff / side_sum));
+          int right_speed = (int)(max_speed/3. + (max_speed/3.) * (side_diff / side_sum));
           // printf("speed diff: %d\n", right_speed - left_speed);
           // printf("side diff: %f\n", 1000*side_diff);
           // printf("side left: %d\n", left_speed);
