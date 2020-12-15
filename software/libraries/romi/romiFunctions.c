@@ -29,7 +29,7 @@ bool inside_tunnel(float * left_us, float * right_us, float side_close){
 
 bool obstacle_detected(RomiSensors_t * sensors, bool * turn_right){\
 	if (sensors->bumps_wheelDrops.bumpLeft || sensors->bumps_wheelDrops.bumpCenter || sensors->bumps_wheelDrops.bumpRight){
-		*turn_right = sensors->bumps_wheelDrops.bumpLeft || sensors->bumps_wheelDrops.bumpCenter;
+		*turn_right = sensors->bumps_wheelDrops.bumpLeft;
 		return true;
 	}
 	return false;

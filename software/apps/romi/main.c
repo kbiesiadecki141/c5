@@ -39,7 +39,7 @@ int main(void) {
   // initialize_robot();
   printf("Romi initialized!\n");
 
-  float front_close = 0.2;
+  float front_close = 0.3;
   float side_close = 0.3;
   float max_diff = side_close;
   float max_speed = 100;
@@ -59,7 +59,7 @@ int main(void) {
   float side_diff;
   float side_sum;
   int back_up_time = 20;
-  int turning_time = 20;
+  int turning_time = 30;
   int back_up_counter;
   int turning_counter;
   RomiSensors_t sensors = {0};
@@ -104,6 +104,7 @@ int main(void) {
           state = AVOID;
           printf("AVOID\n");
           back_up_counter = 0;
+          turning_counter = 0;
         } else if (in_tunnel) {
           state = TUNNEL;
           printf("TUNNEL\n");
@@ -162,6 +163,7 @@ int main(void) {
           state = AVOID;
           printf("AVOID\n");
           back_up_counter = 0;
+          turning_counter = 0;
         } else if (! in_tunnel) {
           state = TELEOP;
           printf("TELEOP\n");
@@ -170,14 +172,14 @@ int main(void) {
 
           side_diff = right_us - left_us;
           side_sum = right_us + left_us;//us_diff(&left_us, &right_us);
-          if(fabs(side_diff) < 0.005){
-            set_speeds(50, 50);
+          if(fabs(side_diff) < 0.01){
+            set_speeds(100, 100);
           } 
           else if (side_diff > 0){
-            set_speeds(0, 50);
+            set_speeds(0, 100);
           }
           else{
-            set_speeds(50, 0);
+            set_speeds(100, 0);
           }
           // int left_speed = (int)(max_speed/3. - (max_speed/3.) * (side_diff / side_sum));
           // int right_speed = (int)(max_speed/3. + (max_speed/3.) * (side_diff / side_sum));
