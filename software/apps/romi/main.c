@@ -40,7 +40,8 @@ int main(void) {
   printf("Romi initialized!\n");
 
   float front_close = 0.2;
-  float side_close = 1;//0.2;
+  float side_close = 0.4;
+  float max_diff = side_close;
   float max_speed = 100;
   float turning_speed = max_speed/2;
 
@@ -52,6 +53,9 @@ int main(void) {
   bool in_tunnel;
 
   bool turn_right;
+  float front_us;
+  float left_us;
+  float right_us;
   float side_diff;
   int back_up_time = 20;
   int turning_time = 10;
@@ -62,12 +66,13 @@ int main(void) {
   // loop forever, running state machine
   while (1) {
     // read sensors from robot
-    read_sensors(&sensors);
+    read_sensors(&sensors, &front_us, &left_us, &right_us);
+    // printf("left us: %lf\n", right_us);
     button_pressed = is_button_pressed(&sensors);
     obs_detected = obstacle_detected(&sensors, &turn_right);
-    obs_avoided = !(obs_detected) && obstacle_avoided(&sensors, front_close);
+    obs_avoided = !(obs_detected) && obstacle_avoided(&front_us, front_close);
     // nrf_delay_ms(1000);
-    in_tunnel = inside_tunnel(&sensors, side_close);
+    in_tunnel = inside_tunnel(&left_us, &right_us, side_close);
 
     // delay before continuing
     // Note: removing this delay will make responses quicker, but will result
@@ -112,9 +117,9 @@ int main(void) {
       case AVOID: {
         // transition logic
 
-        printf("obstacle_avoided %d\n", obs_avoided);
-        printf("back_up_counter %d\n", back_up_counter);
-        printf("turning_counter %d\n", turning_counter);
+        // printf("obstacle_avoided %d\n", obs_avoided);
+        // printf("back_up_counter %d\n", back_up_counter);
+        // printf("turning_counter %d\n", turning_counter);
         if (button_pressed) {
           state = OFF;
         } else if (obs_avoided && back_up_counter >= back_up_time && turning_counter >= turning_time) {
@@ -162,10 +167,13 @@ int main(void) {
         } else {
           // perform state-specific actions here
 
-          side_diff = us_diff(&sensors);
-          //printf("Cliff diff: %lf\n", front_diff);
+          side_diff = us_diff(&left_us, &right_us);
+          int left_speed = (int)(max_speed/4. + (max_speed/8.) * (side_diff / max_diff));
+          int right_speed = (int)(max_speed/4. - (max_speed/8.) * (side_diff / max_diff));
+          printf("left_speed: %d\n", left_speed);
+          printf("right_speed: %d\n", right_speed);
 
-          set_speeds(max_speed/2 * (1 - side_diff / side_close), max_speed/2 * (1 + side_diff / side_close));
+          set_speeds(left_speed, right_speed);
           
           state = TUNNEL;
         }

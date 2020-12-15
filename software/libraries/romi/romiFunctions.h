@@ -12,16 +12,16 @@ typedef enum {
 void initialize_robot();
 
 // INPUTS
-void read_sensors(RomiSensors_t * sensors);
+void read_sensors(RomiSensors_t * sensors, float * front_us, float * left_us, float * right_us);
 
 // FUNCTIONS
-bool inside_tunnel(RomiSensors_t * sensors, float side_close);
+bool inside_tunnel(float * left_us, float * right_us, float side_close);
 
 bool obstacle_detected(RomiSensors_t * sensors, bool * turn_right);
 
-bool obstacle_avoided(RomiSensors_t * sensors, float front_close);
+bool obstacle_avoided(float * front_us, float front_close);
 
-float us_diff(RomiSensors_t * sensors);
+float us_diff(float * left_us, float * right_us);
 
 // OUTPUTS
 void set_speeds(int left, int right);

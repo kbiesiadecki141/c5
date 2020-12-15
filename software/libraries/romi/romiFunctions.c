@@ -3,20 +3,26 @@
 #include "romiActuator.h"
 #include "romiSensorPoll.h"
 #include "hcsr04_ultrasonic.h"
+#include "nrf_delay.h"
 
 // INITIALIZATION
 void initialize_robot(){
-    hcsr04_init(3, 4);
+    // hcsr04_init(3, 4);
 }
 
 // INPUTS
-void read_sensors(RomiSensors_t * sensors){
+void read_sensors(RomiSensors_t * sensors, float * front_us, float * left_us, float * right_us){
 	romiSensorPoll(sensors);
+	*front_us = hcsr04_read_distance(23, 22);
+	*left_us = hcsr04_read_distance(3, 4);//28, 29);
+	
+    // nrf_delay_ms(100);
+    *right_us = hcsr04_read_distance(30, 31);
 }
 
 // FUNCTIONS
-bool inside_tunnel(RomiSensors_t * sensors, float side_close){
-	return sensors->cliffCenter;
+bool inside_tunnel(float * left_us, float * right_us, float side_close){
+	return (*left_us < side_close) && (*right_us < side_close);
 }
 
 bool obstacle_detected(RomiSensors_t * sensors, bool * turn_right){\
@@ -27,15 +33,14 @@ bool obstacle_detected(RomiSensors_t * sensors, bool * turn_right){\
 	return false;
 }
 
-bool obstacle_avoided(RomiSensors_t * sensors, float front_close){
-  	float this_dist = hcsr04_read_distance(3, 4);
+bool obstacle_avoided(float * front_us, float front_close){
     // printf("avoided %d\n", this_dist > front_close);
-	return this_dist > front_close;
+	return *front_us > front_close;
 	// return sensors->bumps_wheelDrops.bumpCenter;
 }
 
-float us_diff(RomiSensors_t * sensors){
-	return sensors->cliffLeft - sensors->cliffRight;
+float us_diff(float * left_us, float * right_us){
+	return *right_us - *left_us;
 }
 
 // OUTPUTS
