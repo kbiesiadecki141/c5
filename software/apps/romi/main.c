@@ -170,16 +170,25 @@ int main(void) {
 
           side_diff = right_us - left_us;
           side_sum = right_us + left_us;//us_diff(&left_us, &right_us);
-          int left_speed = (int)(max_speed/3. - (max_speed/3.) * (side_diff / side_sum));
-          int right_speed = (int)(max_speed/3. + (max_speed/3.) * (side_diff / side_sum));
-          // printf("speed diff: %d\n", right_speed - left_speed);
-          // printf("side diff: %f\n", 1000*side_diff);
-          // printf("side left: %d\n", left_speed);
-          // printf("side right: %d\n", right_speed);
-          // printf("us left: %f\n", 1000*left_us);
-          // printf("us right: %f\n", 1000* right_us);
+          if(fabs(side_diff) < 0.005){
+            set_speeds(50, 50);
+          } 
+          else if (side_diff > 0){
+            set_speeds(0, 50);
+          }
+          else{
+            set_speeds(50, 0);
+          }
+          // int left_speed = (int)(max_speed/3. - (max_speed/3.) * (side_diff / side_sum));
+          // int right_speed = (int)(max_speed/3. + (max_speed/3.) * (side_diff / side_sum));
+          // // printf("speed diff: %d\n", right_speed - left_speed);
+          // // printf("side diff: %f\n", 1000*side_diff);
+          // // printf("side left: %d\n", left_speed);
+          // // printf("side right: %d\n", right_speed);
+          // // printf("us left: %f\n", 1000*left_us);
+          // // printf("us right: %f\n", 1000* right_us);
 
-          set_speeds(left_speed, right_speed);
+          // set_speeds(left_speed, right_speed);
           
           state = TUNNEL;
         }
