@@ -13,11 +13,13 @@ void initialize_robot(){
 // INPUTS
 void read_sensors(RomiSensors_t * sensors, float * front_us, float * left_us, float * right_us){
 	romiSensorPoll(sensors);
-	*front_us = hcsr04_read_distance(23, 22);
+	//*front_us = hcsr04_read_distance(23, 22);
+	*right_us = hcsr04_read_distance(23, 22);
 	*left_us = hcsr04_read_distance(3, 4);//28, 29);
 	
     // nrf_delay_ms(100);
-    *right_us = hcsr04_read_distance(30, 31);
+    //*right_us = hcsr04_read_distance(30, 31);
+    *front_us = hcsr04_read_distance(30, 31);
 }
 
 // FUNCTIONS
