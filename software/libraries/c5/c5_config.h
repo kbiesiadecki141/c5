@@ -12,7 +12,7 @@
 #define FL_B1  16  // Front Left Bogie B channel 1, driven by ENB
 #define FL_B2  17  // Front Left Bogie B channel 2
 
-#define FRONT_RIGHT_A     8  // this pin is connected with enable A pin of L298N module
+#define FRONT_RIGHT_A     29 // this pin is connected with enable A pin of L298N module
 #define FRONT_RIGHT_B     1  // this pin is connected with enable B pin of L298N module
 #define FR_A1  31  // Front Right Bogie A channel 1
 #define FR_A2  5  // Front Right Bogie A channel 2
@@ -24,3 +24,21 @@
 #define OUTPUT_PIN_2 18
 #define OUTPUT_PIN_3 19
 #define OUTPUT_PIN_4 20
+
+
+// Ultrasonic sensors
+#define TRIG_F 3
+#define ECHO_F 4
+
+#define TRIG_RF 3
+#define ECHO_RF 1
+
+#define TRIG_LF 3
+#define ECHO_LF 21
+
+#define TRIG_RB 3
+#define ECHO_RB 4
+
+#define TRIG_LB 3
+#define ECHO_LB 28
+

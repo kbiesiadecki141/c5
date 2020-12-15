@@ -164,7 +164,7 @@ void drive_backward()
   rotate_clockwise(FR_B1, FR_B2); // back bogie
   rotate_clockwise(RR_B1, RR_B2); // rear right
 
-  pwm_update_duty_cycle(0); // Speed control.
+  pwm_update_duty_cycle(15); // Speed control.
 }
 
 void turn_left()
