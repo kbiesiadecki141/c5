@@ -15,9 +15,9 @@ static bool c5_read_bump(bool right, bool front){
 void c5_read_sensors(C5Sensors_t * sensors){
 	sensors->button = c5_read_button();
 
-    sensors->us_f = hcsr04_read_distance(TRIG_F, ECHO_F);
-    sensors->us_rf = hcsr04_read_distance(TRIG_RF, ECHO_RF);
-    sensors->us_lf = hcsr04_read_distance(TRIG_LF, ECHO_LF);
+    //sensors->us_f = hcsr04_read_distance(TRIG_F, ECHO_F);
+    //sensors->us_rf = hcsr04_read_distance(TRIG_RF, ECHO_RF);
+    //sensors->us_lf = hcsr04_read_distance(TRIG_LF, ECHO_LF);
     sensors->us_rb = hcsr04_read_distance(TRIG_RB, ECHO_RB);
     sensors->us_lb = hcsr04_read_distance(TRIG_LB, ECHO_LB);
 
@@ -33,7 +33,9 @@ bool c5_is_button_pressed(C5Sensors_t * sensors){
 }
 
 bool c5_inside_tunnel(C5Sensors_t * sensors, float side_close){
-	return (sensors->us_rf < side_close) && (sensors->us_lf < side_close) && (sensors->us_rb < side_close) && (sensors->us_lb < side_close);
+	//return (sensors->us_rf < side_close) && (sensors->us_lf < side_close) && (sensors->us_rb < side_close) && (sensors->us_lb < side_close);
+	//return (sensors->us_rf < side_close) && (sensors->us_lf < side_close) && (sensors->us_rb < side_close) && (sensors->us_lb < side_close);
+  return false;
 }
 
 bool c5_obstacle_detected(C5Sensors_t * sensors, bool * turn_right){
@@ -45,17 +47,10 @@ bool c5_obstacle_avoided(C5Sensors_t * sensors, float front_close){
 }
 
 float c5_us_diff(C5Sensors_t * sensors){
-	return (sensors->us_lb - sensors->us_lf) - (sensors->us_rb - sensors->us_rf);
+	//return (sensors->us_lb - sensors->us_lf) - (sensors->us_rb - sensors->us_rf);
+  return sensors->us_lb - sensors->us_rb;
 }
 
-// OUTPUTS
-void c5_set_speeds(int left, int right){
-	
-}
-
-void c5_stop(){
-	c5_set_speeds(0, 0);
-}
 
 // // BLUETOOTH HANDLERS
 // char * ble_str_forward = "FORWARD";

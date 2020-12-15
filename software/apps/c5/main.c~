@@ -23,23 +23,6 @@
 #include "c5Functions.h"
 
 bool pwm_initialized = false;
-bool in_tunnel;
-bool in_avoid;
-int left_speed;
-int right_speed;
-
-
-
-bool read_bump() {
-  if (gpio_read(BUMPER)) {
-    printf("BUMPER HI\n");
-    stop_driving();
-    return 1;
-  } else {
-    printf("BUMPER LO\n");
-    return 0;
-  }
-}
 
 // We want to use the PWM drivers, not the PWM library and APP_PWM_INSTANCE.
 nrf_drv_pwm_t m_pwm0 = NRF_DRV_PWM_INSTANCE(0);
@@ -67,19 +50,19 @@ nrf_pwm_sequence_t const seq =
     .end_delay       = 0
 };
 // Set duty cycle between 0 and 100%
-void pwm_update_duty_cycle(uint8_t left_duty_cycle, uint8_t right_duty_cycle)
+void pwm_update_duty_cycle(uint8_t duty_cycle)
 {
     // Move forward by default with REAR_RIGHT_A and REAR_LEFT_B
-    if (left_duty_cycle >= 100) {
+    if (duty_cycle >= 100) {
           seq_values->channel_0 = 100;
           seq_values->channel_1 = 100;
           seq_values->channel_2 = 100;
           seq_values->channel_3 = 100;
     } else {
-          seq_values->channel_0 = left_duty_cycle;
-          seq_values->channel_1 = right_duty_cycle;
-          seq_values->channel_2 = left_duty_cycle;
-          seq_values->channel_3 = right_duty_cycle;
+          seq_values->channel_0 = duty_cycle;
+          seq_values->channel_1 = duty_cycle;
+          seq_values->channel_2 = duty_cycle;
+          seq_values->channel_3 = duty_cycle;
     }
 
     // potentially have different sequences for backwards/forwards
@@ -165,12 +148,14 @@ void drive_forward()
   pwm_init(&m_pwm2, REAR_RIGHT_A, REAR_LEFT_B,
                     NRF_DRV_PWM_PIN_NOT_USED,
                     NRF_DRV_PWM_PIN_NOT_USED);
-    pwm_update_duty_cycle(left_speed, right_speed); // Speed control.
+    pwm_update_duty_cycle(0); // Speed control.
 }
+
+// not A1B1, A2B2
 
 void drive_backward()
 {
-  printf("Drive backwards\n");
+    printf("Drive backwards\n");
   rotate_clockwise(FL_A1, FL_A2); // back bogie
   rotate_clockwise(FL_B1, FL_B2); // front bogie
   rotate_counterclockwise(RL_A1, RL_A2); // rear left
@@ -179,7 +164,7 @@ void drive_backward()
   rotate_clockwise(FR_B1, FR_B2); // back bogie
   rotate_clockwise(RR_B1, RR_B2); // rear right
 
-  pwm_update_duty_cycle(left_speed, right_speed); // Speed control.
+  pwm_update_duty_cycle(15); // Speed control.
 }
 
 void turn_left()
@@ -195,11 +180,10 @@ void turn_left()
   rotate_counterclockwise(FR_B1, FR_B2); // back bogie
   rotate_counterclockwise(RR_B1, RR_B2); // rear right
 
-    pwm_update_duty_cycle(left_speed, right_speed); // Speed control.
-  
+  pwm_update_duty_cycle(0); // Speed control.
 }
 
-void drive_right()
+void turn_right()
 {
   printf("Drive right \n");
   // Left side.
@@ -212,7 +196,7 @@ void drive_right()
   rotate_clockwise(FR_B1, FR_B2); // back bogie
   rotate_clockwise(RR_B1, RR_B2); // rear right
 
-    pwm_update_duty_cycle(left_speed, right_speed); // Speed control.
+  pwm_update_duty_cycle(0); // Speed control.
 }
 
 void stop_driving() 
@@ -241,48 +225,30 @@ char * ble_str_left = "TURN LEFT";
 char * ble_str_right = "TURN RIGHT";
 
 void move(char * msg_buffer) {
-   left_speed = 0;
-   right_speed = 0;
    printf("CHATTER Received: %s", msg_buffer); 
    printf("\n");
-   
-   if (!in_tunnel && !in_avoid) {
-     if (strcmp(msg_buffer, ble_str_forward) == 0) { 
-        printf("Moving forward...\n"); 
-        drive_forward();
-     } else if (strcmp(msg_buffer, ble_str_backward) == 0) { 
-         printf("Moving backward...\n"); 
-         drive_backward(); // not working on right bogie :()
-     } else if (strcmp(msg_buffer, ble_str_left) == 0) { 
-         printf("Moving left...\n"); 
-         turn_left();
-     } else if (strcmp(msg_buffer, ble_str_right) == 0) { 
-         printf("Moving right...\n"); 
-         drive_right();
-     } else if (strcmp(msg_buffer, ble_str_stop) == 0) { 
-         printf("Stopping...\n"); 
-         stop_driving();
-         //pwm_update_duty_cycle(100);
 
-     } else {
-         printf("Action not defined. \n"); 
-     }   
-      pwm_initialized = true;
-    }
-}
+   if (strcmp(msg_buffer, ble_str_forward) == 0) { 
+      printf("Moving forward...\n"); 
+      drive_forward();
+   } else if (strcmp(msg_buffer, ble_str_backward) == 0) { 
+       printf("Moving backward...\n"); 
+       drive_backward(); // not working on right bogie :()
+   } else if (strcmp(msg_buffer, ble_str_left) == 0) { 
+       printf("Moving left...\n"); 
+       turn_left();
+   } else if (strcmp(msg_buffer, ble_str_right) == 0) { 
+       printf("Moving right...\n"); 
+       turn_right();
+   } else if (strcmp(msg_buffer, ble_str_stop) == 0) { 
+       printf("Stopping...\n"); 
+       stop_driving();
+       //pwm_update_duty_cycle(100);
 
-void c5_set_speeds(int left, int right) {
-  if (left > 0 && right > 0) {
-    drive_forward();
-  } else if (left < 0 && right < 0) {
-    drive_backward();
-  } else if (left > 0 && right < 0) {
-    turn_left();
-  } else if (left < 0 && right > 0) {
-    drive_right();
-  }
-  left_speed = left; 
-  right_speed = right;
+   } else {
+       printf("Action not defined. \n"); 
+   }   
+    pwm_initialized = true;
 }
 
 int main(void) {
@@ -315,8 +281,6 @@ int main(void) {
   gpio_config(RR_B1, OUTPUT);
   gpio_config(RR_B2, OUTPUT);
 
-  gpio_config(BUMPER, INPUT);
-
   pwm_init(&m_pwm0, FRONT_LEFT_A, FRONT_LEFT_B,
                     NRF_DRV_PWM_PIN_NOT_USED,
                     NRF_DRV_PWM_PIN_NOT_USED);
@@ -337,10 +301,11 @@ int main(void) {
   float turning_speed = max_speed/2;
 
   // configure initial state
-  robot_state_t state = TELEOP;
+  robot_state_t state = OFF;
   bool button_pressed;
   bool obs_detected;
   bool obs_avoided;
+  bool in_tunnel;
 
   bool turn_right;
   float side_diff;
@@ -349,10 +314,9 @@ int main(void) {
   int back_up_counter;
   int turning_counter;
   C5Sensors_t sensors = {0};
-  in_avoid = false;
 
   init_ble_rc(move);
-  printf("here");
+
   // loop forever, running state machine
   while (1) {
     // read sensors from robot
@@ -369,6 +333,7 @@ int main(void) {
     // nrf_delay_ms(1);
     // pwm_update_duty_cycle(0);
 
+
     // handle states
     switch(state) {
       case OFF: {
@@ -378,7 +343,7 @@ int main(void) {
           printf("TELEOP\n");
         } else {
           // perform state-specific actions here
-          stop_driving();
+          c5_stop();
           state = OFF;
         }
         break; // each case needs to end with break!
@@ -387,17 +352,18 @@ int main(void) {
       case TELEOP: {
         // transition logic
         if (button_pressed) {
-          //state = OFF;
-        } else if (read_bump()) {
-          //c5_set_speeds(-max_speed, -max_speed);
-          //state = AVOID;
+          state = OFF;
+        } else if (obs_detected) {
+          c5_set_speeds(-max_speed, -max_speed);
+          state = AVOID;
           printf("AVOID\n");
           back_up_counter = 0;
         } else if (in_tunnel) {
-          //state = TUNNEL;
+          state = TUNNEL;
+          printf("TUNNEL\n");
         } else {
           // perform state-specific actions here
-          //c5_set_speeds(max_speed, max_speed);
+          c5_set_speeds(max_speed, max_speed);
           state = TELEOP;
         }
         break; // each case needs to end with break!
@@ -411,9 +377,7 @@ int main(void) {
         printf("turning_counter %d\n", turning_counter);
         if (button_pressed) {
           state = OFF;
-          in_avoid = false;
         } else if (obs_avoided && back_up_counter >= back_up_time && turning_counter >= turning_time) {
-          in_avoid = false;
           if (in_tunnel) {
             state = TUNNEL;
             printf("TUNNEL\n");
@@ -422,14 +386,10 @@ int main(void) {
             printf("TELEOP\n");
           }
         } else {
-          in_avoid = true;
           // perform state-specific actions here
           if (back_up_counter < back_up_time) {
             back_up_counter = back_up_counter + 1;
-            //c5_set_speeds(-max_speed, -max_speed);
-            left_speed = 0;
-            right_speed = 0;
-            drive_backward();
+            c5_set_speeds(-max_speed, -max_speed);
           } else {
             if (obs_avoided) {
               turning_counter = turning_counter + 1;
@@ -437,15 +397,9 @@ int main(void) {
               turning_counter = 0;
             }
             if (turn_right) {
-              left_speed = 0;
-              right_speed = 0;
-              drive_right();
-              //c5_set_speeds(turning_speed, -turning_speed);
+              c5_set_speeds(turning_speed, -turning_speed);
             } else {
-              left_speed = 0;
-              right_speed = 0;
-              turn_left();
-              //c5_set_speeds(-turning_speed, turning_speed);
+              c5_set_speeds(-turning_speed, turning_speed);
             }
           }
           state = AVOID;

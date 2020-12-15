@@ -25,8 +25,4 @@ bool c5_obstacle_avoided(C5Sensors_t * sensors, float front_close);
 float c5_us_diff(C5Sensors_t * sensors);
 
 // OUTPUTS
-void c5_set_speeds(int left, int right);
-
-void c5_stop();
-
 void move(char * msg_buffer);

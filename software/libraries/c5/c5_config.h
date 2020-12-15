@@ -16,14 +16,18 @@
 #define FRONT_RIGHT_B     1  // this pin is connected with enable B pin of L298N module
 #define FR_A1  31  // Front Right Bogie A channel 1
 #define FR_A2  5  // Front Right Bogie A channel 2
-#define FR_B1  6  // Front Right Bogie B channel 1
-#define FR_B2  29  // Front Right Bogie B channel 2
+#define FR_B1  11  // Front Right Bogie B channel 1
+#define FR_B2  30  // Front Right Bogie B channel 2
 
 // On-board LEDs test example for debugging
 #define OUTPUT_PIN_1 17
 #define OUTPUT_PIN_2 18
 #define OUTPUT_PIN_3 19
 #define OUTPUT_PIN_4 20
+
+// DOESN'T WORK: 25, 8, 0, 1, 10, 9,
+// DOES WORK: 7, 27, 26, 6
+#define BUMPER 6
 
 
 // Ultrasonic sensors
