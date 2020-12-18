@@ -98,6 +98,7 @@ float hcsr04_read_distance(const int trig_pin, const int echo_pin) {
     // printf("dist %f\n", us_dist);
 
     __WFI();
+    __WFI();
     diff_time = end_time - start_time;
     us_dist = diff_time * 340 / 2000000.;
     return us_dist;

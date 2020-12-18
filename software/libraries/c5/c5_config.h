@@ -30,15 +30,15 @@
 #define TRIG_F 3
 #define ECHO_F 4
 
-#define TRIG_RF 3
-#define ECHO_RF 1
-
 #define TRIG_LF 3
-#define ECHO_LF 21
-
-#define TRIG_RB 3
-#define ECHO_RB 4
+#define ECHO_LF 1
 
 #define TRIG_LB 3
-#define ECHO_LB 28
+#define ECHO_LB 4
+
+#define TRIG_RF 3
+#define ECHO_RF 6
+
+#define TRIG_RB 28
+#define ECHO_RB 4
 

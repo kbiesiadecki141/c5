@@ -338,17 +338,21 @@ int main(void) {
   // loop forever, running state machine
   while (1) {
     // read sensors from robot
-    read_sensors(&sensors, &front_us, &left_us, &right_us);
+    //read_sensors(&sensors, &front_us, &sensors.us_lf, &sensors.us_lb);
     // printf("left us: %lf\n", right_us);
+
+    c5_read_sensors(&sensors);
+    printf("right us front %f \n", sensors.us_rf);
+    printf("right us back %f \n", sensors.us_rb);
 
     // read sensors from robot
     read_bump();
-    c5_read_sensors(&sensors);
-    button_pressed = is_button_pressed(&sensors);
-    obs_detected = obstacle_detected(&sensors, &turn_right);
-    obs_avoided = !(obs_detected) && obstacle_avoided(&front_us, front_close);
+    button_pressed = c5_is_button_pressed(&sensors);
+    obs_detected = c5_obstacle_detected(&sensors, &turn_right);
+    obs_avoided = !(obs_detected) && c5_obstacle_avoided(&front_us, front_close);
     // nrf_delay_ms(1000);
     in_tunnel = inside_tunnel(&left_us, &right_us, side_close);
+
 
     // delay before continuing
     // Note: removing this delay will make responses quicker, but will result
@@ -456,7 +460,7 @@ int main(void) {
             c5_set_speeds(0, 100);
           }
           else{
-            c5_set_speeds(100, 0);
+            set_speeds(100, 0);
           }
 
           // c5_set_speeds(max_speed/2 * (1 + side_diff / side_close), max_speed/2 * (1 - side_diff / side_close));
